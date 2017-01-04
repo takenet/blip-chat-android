@@ -29,11 +29,11 @@ Snapshots of the development version are available in [Sonatype's `snapshots` re
 How to use `@blip-sdk-android`
 -------------------------
 
-### Quick start
+## Quick start
 
-## Setting your SDK
+### Setting your SDK
 
-After to add reference you must provide a valid BLiP account. *To get this account enter in contact with BLiP team.*
+After to add sdk reference you must provide a valid BLiP account. *To get this account enter in contact with BLiP team.*
 If you already have your account set your credentials on **local.properties** file like bellow
 
 ```groovy
@@ -41,7 +41,7 @@ blipsdk.ownerIdentity = <your-valid-identity>
 blipsdk.ownerPassword = <your-valid-password>
 ```
 
-## Open a new Activity with a BLiP conversation
+### Open a new BLiP conversation
 
 To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
 
@@ -49,7 +49,7 @@ To open a new thread is very simple. Use **BlipClient** helper class and call *o
 BlipClient.openBlipThread(context, "<your-chatbot-identifier>@msging.net");
 ```
 
-For instance, imagine that you want establish a new conversation between your user and your chatbot, when your MainActivity is loaded. 
+For instance, imagine that you want establish a new conversation between your customer and your chatbot, when your MainActivity is loaded. 
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-### Advanced features
+## Advanced features
 
 ### Setting informations about your client
 
@@ -122,5 +122,5 @@ License
 
  [1]: https://blip.ai
  [2]: https://portal.blip.ai/#/docs/home
- [3]: https://search.maven.org/remote_content?
+ [3]: http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.take%22
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/
