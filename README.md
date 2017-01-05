@@ -46,7 +46,7 @@ blipsdk.ownerPassword = <your-valid-password>
 To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
 
 ```java
-BlipClient.openBlipThread(context, "<your-chatbot-identifier>@msging.net");
+BlipClient.openBlipThread(context, "<your-chatbot-identifier>");
 ```
 
 For instance, imagine that you want establish a new conversation between your customer and your chatbot, when your MainActivity is loaded. 
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BlipClient.openBlipThread(this, "chatbotsample@msging.net");
+        BlipClient.openBlipThread(this, "chatbotsample");
     }
 }
 ```
@@ -72,7 +72,16 @@ Sometimes, is very important that your chatbot knows informations about your cus
 To do this use *setUserAccount* method on **BlipClient** helper class.
 
 ```java
-BlipClient.setUserAccount(context, new BlipAccount("Name", "PhotoUri", "ExternalId"));
+Map<String, String> extraInformations = new HashMap<String, String>();
+extraInformations.put("some-key", "some-value");
+
+BlipAccount customerAccount = new BlipAccount();
+customerAccount.setName("Name");
+customerAccount.setPhotoUri("PhotoUri");
+customerAccount.setExternalId("ExternalId");
+customerAccount.setExtras(extraInformations);
+
+BlipClient.setUserAccount(context, customerAccount);
 ```
 
 For instance,
@@ -89,20 +98,25 @@ public class MainActivity extends AppCompatActivity {
         String customerName = "Blip SDK Test User";
         String customerPhotoUri = "http://i.imgur.com/8oL7Ol8.png";
         String customerIdentifier = UUID.randomUUID().toString();
+        String someSpecificValue = "<your-specifc-value>";
 
-        BlipAccount blipAccount = new BlipAccount(customerName, customerPhotoUri, customerIdentifier);
 
-        BlipClient.setUserAccount(this, blipAccount);
+        Map<String, String> extraInformations = new HashMap<String, String>();
+        extraInformations.put("your-specifc-key", someSpecificValue);
+
+        BlipAccount customerAccount = new BlipAccount();
+        customerAccount.setName(customerName);
+        customerAccount.setPhotoUri(customerPhotoUri);
+        customerAccount.setExternalId(customerIdentifier);
+        customerAccount.setExtras(extraInformations);
+
+        BlipClient.setUserAccount(this, customerAccount);
 
         //Now, if you start some thread your chatbot will know some informations about your customers
-        BlipClient.openBlipThread(this, "chatbotsample@msging.net");
+        BlipClient.openBlipThread(this, "chatbotsample");
     }
 }
 ```
-
-> TODO: Change complete node for only chatbot identifier
-  TODO: Chaneg BlipAccount to add generic fields and add setters
-
 
 License
 -------
