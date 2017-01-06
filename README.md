@@ -34,7 +34,7 @@ How to use `@blip-sdk-android`
 ### Setting your SDK
 
 After to add sdk reference you must provide a valid BLiP account. *To get this account enter in contact with BLiP team.*
-If you already have your account set your credentials on **local.properties** file like bellow
+If you already have your account, create a file named **blip.properties** inside the *assets* folder on your project and set your credentials like bellow
 
 ```groovy
 blipsdk.ownerIdentity = <your-valid-identity>
