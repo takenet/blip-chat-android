@@ -26,7 +26,7 @@ or download [the latest JAR][3] and import in your app.
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
-How to use `@blip-sdk-android`
+How to use
 -------------------------
 
 ## Quick start
