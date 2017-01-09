@@ -31,22 +31,46 @@ How to use `@blip-sdk-android`
 
 ## Quick start
 
-### Setting your SDK
+### Prerequisites
 
-After to add sdk reference you must provide a valid BLiP account. *To get this account enter in contact with BLiP team.*
-If you already have your account, create a file named **blip.properties** inside the *assets* folder on your project and set your credentials like bellow
+* Add the internet permission on AndroidManifest.xml
 
-```groovy
-blipsdk.ownerIdentity = <your-valid-identity>
-blipsdk.ownerPassword = <your-valid-password>
+```xml
+<manifest xlmns:android...>
+ ...
+ <uses-permission android:name="android.permission.INTERNET" />
+ <application ...
+</manifest>
 ```
 
-### Open a new BLiP conversation
+### Setting your SDK
+
+After include sdk reference on your project you must provide a valid **BLiP owner account**. 
+Only with this special account is possible use this sdk.
+
+__To get an owner account enter in contact with BLiP team__
+
+### After get your owner account
+
+1. Create a new properties file named **blip.properties** inside the *assets* folder on your project 
+
+*To create a **assets** folder: 'Right click on app module' > 'New' > 'Folder' > Assets Folder*
+
+![](images/assetsfolder.png)
+
+2. Set your credentials, like bellow, on **blip.properties** file
+
+```groovy
+blipsdk.ownerIdentity = your-valid-identity
+blipsdk.ownerPassword = your-valid-password
+```
+
+### Openning a new BLiP conversation
 
 To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
 
 ```java
-BlipClient.openBlipThread(context, "<your-chatbot-identifier>");
+BlipClient.openBlipThread(context, "your-chatbot-identifier");
 ```
 
 For instance, imagine that you want establish a new conversation between your customer and your chatbot, when your MainActivity is loaded. 
@@ -59,10 +83,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BlipClient.openBlipThread(this, "chatbotsample");
+        BlipClient.openBlipThread(this, "testeblipcards");
     }
 }
 ```
+
+*To find your chatbot identifier go to [BLiP Portal](https://portal.blip.ai/#/application), select your chatbot and click 'Settings' on the left bar.
 
 ## Advanced features
 
