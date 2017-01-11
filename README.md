@@ -2,7 +2,7 @@
 Blip SDK for Android
 ======
 
-SDK to easly add BLiP conversations in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2].
+SDK to easily add BLiP conversations in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2].
 
 Installation
 --------
@@ -46,11 +46,11 @@ How to use
 ### Setting your SDK
 
 After include sdk reference on your project you must provide a valid **BLiP owner account**. 
-Only with this special account is possible use this sdk.
+Only with this special account is possible to use this sdk.
 
 __To get an owner account enter in contact with BLiP team__
 
-### After get your owner account
+### After getting your owner account
 
 1. Create a new properties file named **blip.properties** inside the *assets* folder on your project 
 
@@ -73,7 +73,7 @@ To open a new thread is very simple. Use **BlipClient** helper class and call *o
 BlipClient.openBlipThread(context, "your-chatbot-identifier");
 ```
 
-For instance, imagine that you want establish a new conversation between your customer and your chatbot, when your MainActivity is loaded. 
+For instance, imagine that you want to establish a new conversation between your customer and your chatbot, when your MainActivity is loaded.
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -92,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
 ## Advanced features
 
-### Setting informations about your client
+### Setting information about your client
 
-Sometimes, is very important that your chatbot knows informations about your customers, as name or some external identifier for example. 
+Sometimes, is very important that your chatbot knows information about your customers, as name or some external identifier for example.
 To do this use *setUserAccount* method on **BlipClient** helper class.
 
 ```java
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         BlipClient.setUserAccount(this, customerAccount);
 
-        //Now, if you start some thread your chatbot will know some informations about your customers
+        //Now, if you start some thread your chatbot will know some information about your customers
         BlipClient.openBlipThread(this, "chatbotsample");
     }
 }
