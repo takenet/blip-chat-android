@@ -65,7 +65,7 @@ blipsdk.ownerIdentity = your-valid-identity
 blipsdk.ownerPassword = your-valid-password
 ```
 
-### Openning a new BLiP conversation
+### Opening a new BLiP conversation
 
 To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
 
