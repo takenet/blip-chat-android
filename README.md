@@ -9,7 +9,7 @@ Installation
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-sdk:0.0.7'
+compile 'net.take:blip-sdk:0.0.10'
 ```
 
 or Maven:
@@ -17,7 +17,7 @@ or Maven:
 <dependency>
   <groupId>net.take</groupId>
   <artifactId>blip-sdk</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.10</version>
   <type>pom</type>
 </dependency>
 ```
