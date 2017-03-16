@@ -9,7 +9,7 @@ Installation
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-sdk:0.0.11'
+compile 'net.take:blip-sdk:0.0.16'
 ```
 
 or Maven:
@@ -17,7 +17,7 @@ or Maven:
 <dependency>
   <groupId>net.take</groupId>
   <artifactId>blip-sdk</artifactId>
-  <version>0.0.11</version>
+  <version>0.0.16</version>
   <type>pom</type>
 </dependency>
 ```
@@ -33,12 +33,14 @@ How to use
 
 ### Prerequisites
 
-* Add the internet permission on AndroidManifest.xml
+* Add the internet and fine location permissions on AndroidManifest.xml
 
 ```xml
 <manifest xlmns:android...>
  ...
  <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+ 
  <application ...
 </manifest>
 ```
