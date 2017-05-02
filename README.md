@@ -123,7 +123,7 @@ To see more details about authentication types [click here][4].
 ### Support
 -------
 
-  Version 4.4 (Kitkat) or later
+  Android 4.4 (Kitkat) or later
 
 License
 -------
