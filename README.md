@@ -2,7 +2,7 @@
 Blip SDK for Android
 ======
 
-SDK to easily add BLiP conversations in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2].
+SDK to easily add BLiP conversations in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
 
 Installation
 --------
@@ -119,6 +119,11 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 To see more details about authentication types [click here][4].
+
+### Support
+-------
+
+  Version 4.4 (Kitkat) or later
 
 License
 -------
