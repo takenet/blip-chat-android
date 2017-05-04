@@ -9,15 +9,15 @@ Installation
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-sdk:0.0.19'
+compile 'net.take:blip-chat:0.0.21'
 ```
 
 or Maven:
 ```xml
 <dependency>
   <groupId>net.take</groupId>
-  <artifactId>blip-sdk</artifactId>
-  <version>0.0.19</version>
+  <artifactId>blip-chat</artifactId>
+  <version>0.0.21</version>
   <type>pom</type>
 </dependency>
 ```
