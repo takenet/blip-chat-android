@@ -1,8 +1,8 @@
 
-Blip SDK for Android
+BLiP Chat for Android
 ======
 
-SDK to easily add BLiP conversations in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
+SDK to easily add BLiP Chat widget in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
 
 Installation
 --------
@@ -48,7 +48,7 @@ How to use
 
 After including sdk reference on your project you need to get your api key on [BLiP portal][3]. Go to the left menu and access `Publications > Blip Chat`.
 
-### Opening a new BLiP conversation
+### Opening the BLiP conversation widget
 
 To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
 
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
 ### Defining authentication type
 
-BLiP Android SDK supports three different user authentication types. It is possible to define which authentication method BLiP SDK will use to identify your client.
+BLiP Chat android sdk supports three different user authentication types. It is possible to define which authentication method will be used to identify your client.
 
 * Guest - Users will receive a guest account to interact with the chatbot. In this mode the users have not message history.
 * Login - Users will receive an account with his 'Name' and 'Email' (provided by the user) to interact with the chatbot. In this mode the users have not message history.
@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-To see more details about authentication types [click here][4].
 
 ### Support
 -------
@@ -144,6 +143,5 @@ License
  [1]: https://blip.ai
  [2]: https://portal.blip.ai/#/docs/home
  [3]: http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.take%22
- [4]: 
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/
  
