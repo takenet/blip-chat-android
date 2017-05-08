@@ -98,7 +98,7 @@ BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
 
 ### Hiding Menu
 
-BLiP Chat android sdk has a menu that can be hidden. To do that you only need to set hideMenu property of BlipOptions.
+BLiP Chat android sdk has a menu that can be hidden. To do that you only need to set hideMenu property of BlipOptions. *This menu is visible by default.*
 
 ```java
 BlipOptions blipOptions = new BlipOptions();
