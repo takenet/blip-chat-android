@@ -81,7 +81,7 @@ BLiP Chat android sdk supports three different user authentication types. It is 
 * Login - Users will receive an account with his 'Name' and 'Email' (provided by the user) to interact with the chatbot. In this mode the users have not message history.
 * Dev - Users will receive an account identified by developer to interact with the chatbot. User data must be provided passing a BlipOptions instance as parameter on *BlipClient.openThread* method. You can set 4 properties: `userIdentifier`, `userPassword`, `userName` and `userEmail`. `UserIdentifier` and `userPassword` are **required**. In this mode the users have message history.
 
-To define what user authetication type use the AuthType enum on authType propertie of BlipOptions. Possible values for authType are: `AuthType.GUEST`, `AuthType.LOGIN` and `AuthType.DEV`.
+To define what user authetication type use the AuthType enum on authType property of BlipOptions. Possible values for authType are: `AuthType.GUEST`, `AuthType.LOGIN` and `AuthType.DEV`.
 
 Note: Guest type will be used as default If you do not define 'authType'.
 
@@ -96,7 +96,20 @@ blipOptions.setUserEmail("USER-EMAIL");
 BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
 ```
 
-For instance,
+### Hiding Menu
+
+BLiP Chat android sdk has a menu that can be hidden. To do that you only need to set hideMenu property of BlipOptions.
+
+```java
+BlipOptions blipOptions = new BlipOptions();
+blipOptions.setHideMenu(true);
+
+BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
+```
+
+### Example 
+
+Defining auth type DEV and hiding menu:
 
 ```java
 
@@ -113,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         blipOptions.setUserPassword("USER-PASSWORD");
         blipOptions.setUserName("USER-NAME");
         blipOptions.setUserEmail("USER-EMAIL");
+        blipOptions.setHideMenu(true);
 
         BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
     }
