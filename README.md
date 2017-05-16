@@ -7,13 +7,13 @@ SDK to easily add BLiP Chat widget in your Android app. For more information see
 Installation
 --------
 
-Add the maven repository reference to build.gradle file of your project
+Add the jcenter maven repository reference to build.gradle file of your project
 
 ```groovy
 allprojects {
     repositories {
         //others repository dependencies
-        maven { url 'http://dl.bintray.com/takenet/maven' }
+        jcenter()
     }
 }
 ```
