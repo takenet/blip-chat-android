@@ -44,30 +44,33 @@ How to use
 
 ### Prerequisites
 
-* Add the internet and location permissions on AndroidManifest.xml
+* Add the INTERNET permissions on AndroidManifest.xml in order to use this library. If there is a request location on your chatbot flow you should also add the ACCESS_FINE_LOCATION permission. To send or download files on BLiP Chat add WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE permissions.
 
 ```xml
 <manifest xlmns:android...>
  ...
  <uses-permission android:name="android.permission.INTERNET" />
  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+ <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
  <application ...
 </manifest>
 ```
 
 ### Setting your SDK
 
-After including sdk reference on your project you need to get your api key on [BLiP portal][3]. Go to the left menu and access `Publications > Blip Chat`. You will also need to add your Android Application Id on the `Domains` section, in order to enable your chatbot in your app.
+After including sdk reference to your project you need to get your app key on [BLiP portal][1].Choose your bot, go to the upper menu and access `Channels > Blip Chat`. On the `Setup` tab you will be able to get the required app key. You will also need to add your Android Application Id on the `Domains` section, in order to enable your chatbot in your app.
 
 ### Opening the BLiP conversation widget
 
-To open a new thread is very simple. Use **BlipClient** helper class and call *openBlipThread* method
+Opening a new thread is a very simple process. Use **BlipClient** helper class and call *openBlipThread* method
 
 ```java
-BlipClient.openBlipThread(context, "YOUR_API_KEY");
+BlipClient.openBlipThread(context, "YOUR_APP_KEY");
 ```
 
-For instance, imagine that you want to establish a new conversation between your customer and your chatbot, when your MainActivity is loaded.
+For instance, imagine that when your MainActivity is loaded you want to establish a new conversation between customer and chatbot.
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BlipClient.openBlipThread(context, "YOUR_API_KEY");
+        BlipClient.openBlipThread(context, "YOUR_APP_KEY");
     }
 }
 ```
@@ -88,66 +91,61 @@ public class MainActivity extends AppCompatActivity {
 
 BLiP Chat android sdk supports three different user authentication types. It is possible to define which authentication method will be used to identify your client.
 
-* Guest - Users will receive a guest account to interact with the chatbot. In this mode the users have not message history.
-* Login - Users will receive an account with his 'Name' and 'Email' (provided by the user) to interact with the chatbot. In this mode the users have not message history.
-* Dev - Users will receive an account identified by developer to interact with the chatbot. User data must be provided passing a BlipOptions instance as parameter on *BlipClient.openThread* method. You can set 4 properties: `userIdentifier`, `userPassword`, `userName` and `userEmail`. `UserIdentifier` and `userPassword` are **required**. In this mode the users have message history.
+* Not integrated - Users will receive a guest account to interact with the chatbot.
+<!-- * Login - Users will receive an account with his 'Name' and 'Email' (provided by the user) to interact with the chatbot. In this mode the users have not message history. -->
+* Integrated - Users will receive an account identified by developer to interact with the chatbot. User data must be provided passing a BlipOptions instance as parameter on *BlipClient.openThread* method. You can set 2 properties: `authConfig` and `account`.
 
-To define what user authetication type use the AuthType enum on authType property of BlipOptions. Possible values for authType are: `AuthType.GUEST`, `AuthType.LOGIN` and `AuthType.DEV`.
+#Auth Config
+
+| Property          | Description                          |
+| ----------------- | ------------------------------------ |
+| authType          | Defines the auth type to be used     |
+| userIdentity      | The user identifier                  |
+| userPassword      | The user password                    |
+
+*Required if on integrated auth type.
+
+To define what user authetication type use the AuthType enum on authType property of BlipOptions. Possible values for authType are: `AuthType.GUEST` (Not integrated) and `AuthType.DEV` (Integrated).
 
 Note: Guest type will be used as default If you do not define 'authType'.
 
+#Account
+
+Check this [link](http://limeprotocol.org/resources.html#account) to see possible properties.
+
+#Example
+
 ```java
+
+import net.take.blipchat.AuthType;
+import net.take.blipchat.BlipClient;
+import net.take.blipchat.models.AuthConfig;
+import net.take.blipchat.models.BlipOptions;
+
+import org.limeprotocol.messaging.resources.Account;
+
+...
+
+AuthConfig authConfig = new AuthConfig(AuthType.Dev, "userId123PS","pass123PS");
+
+Account account = new Account();
+account.setFullName("User Name Android123");
+account.setEmail("test@android.com");
+
 BlipOptions blipOptions = new BlipOptions();
-blipOptions.setAuthType(AuthType.DEV);
-blipOptions.setUserIdentifier("USER-IDENTIFIER");
-blipOptions.setUserPassword("USER-PASSWORD");
-blipOptions.setUserName("USER-NAME");
-blipOptions.setUserEmail("USER-EMAIL");
+blipOptions.setAuthConfig(authConfig);
+blipOptions.setAccount(account);
 
-BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
-```
+BlipClient.openBlipThread(context, APP_KEY, blipOptions);
 
-### Hiding Menu
-
-BLiP Chat android sdk has a menu that can be hidden. To do that you only need to set hideMenu property of BlipOptions. *This menu is visible by default.*
-
-```java
-BlipOptions blipOptions = new BlipOptions();
-blipOptions.setHideMenu(true);
-
-BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
-```
-
-### Example 
-
-Defining auth type DEV and hiding menu:
-
-```java
-
-public class MainActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        BlipOptions blipOptions = new BlipOptions();
-        blipOptions.setAuthType(AuthType.DEV);
-        blipOptions.setUserIdentifier("USER-IDENTIFIER");
-        blipOptions.setUserPassword("USER-PASSWORD");
-        blipOptions.setUserName("USER-NAME");
-        blipOptions.setUserEmail("USER-EMAIL");
-        blipOptions.setHideMenu(true);
-
-        BlipClient.openBlipThread(context, "YOUR_API_KEY", blipOptions);
-    }
-}
 ```
 
 ### Support
 -------
 
-  Android 4.4 (Kitkat) or later
+  Android 4.4 (Kitkat)* or later
+
+ *BLiP Chat for Android does not support file input on Android 4.4.
 
 License
 -------
@@ -165,8 +163,8 @@ License
     limitations under the License.
 
 
- [1]: https://blip.ai
- [2]: https://portal.blip.ai/#/docs/home
+ [1]: https://preview.blip.ai
+ [2]: https://docs.blip.ai/
  [3]: http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.take%22
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/
- 
+
