@@ -60,7 +60,7 @@ How to use
 
 ### Setting your SDK
 
-After including sdk reference to your project you need to get your app key on [BLiP portal][1].Choose your bot, go to the upper menu and access `Channels > Blip Chat`. On the `Setup` tab you will be able to get the required app key. You will also need to add your Android Application Id on the `Domains` section, in order to enable your chatbot in your app.
+After including sdk reference to your project you need to get your app key on [BLiP portal][1]. Choose the desired bot, go to the upper menu and access `Channels > Blip Chat`. On the `Setup` tab you will be able to get the required app key. You will also need to add your Android Application Id on the `Domains` section, in order to enable your chatbot in your app.
 
 ### Opening the BLiP conversation widget
 
