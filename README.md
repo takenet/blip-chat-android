@@ -44,7 +44,7 @@ How to use
 
 ### Prerequisites
 
-* Add the INTERNET permissions on AndroidManifest.xml in order to use this library. If there is a request location on your chatbot flow you should also add the ACCESS_FINE_LOCATION permission. To send or download files on BLiP Chat add WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE permissions.
+* Add the INTERNET permissions on AndroidManifest.xml in order to use this library. If there is a request location on your chatbot flow you should also add the ACCESS_FINE_LOCATION permission. To send or download files on BLiP Chat add WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE and CAMERA permissions.
 
 ```xml
 <manifest xlmns:android...>
