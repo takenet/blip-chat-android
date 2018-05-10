@@ -2,7 +2,7 @@
 BLiP Chat for Android
 ======
 
-SDK to easily add BLiP Chat widget in your Android app. For more information see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
+SDK to easily add BLiP Chat's widget to your Android app. For more information, see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
 
 Installation
 --------
@@ -33,9 +33,9 @@ or Maven:
 </dependency>
 ```
 
-or download [the latest JAR][3] and import in your app.
+or download [the latest JAR][3] and import into your app.
 
-Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
+Snapshots of the development version are available at [Sonatype's `snapshots` repository][snap].
 
 How to use
 -------------------------
@@ -44,7 +44,7 @@ How to use
 
 ### Prerequisites
 
-* Add the INTERNET permissions on AndroidManifest.xml in order to use this library. If there is a request location on your chatbot flow you should also add the ACCESS_FINE_LOCATION permission. To send or download files on BLiP Chat add WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE and CAMERA permissions.
+* Add the INTERNET permissions to AndroidManifest.xml in order to use this library. If there is a request location on your chatbot flow, you should also add the ACCESS_FINE_LOCATION permission. To send or download files on BLiP Chat, add WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE and CAMERA permissions.
 
 ```xml
 <manifest xlmns:android...>
@@ -61,7 +61,7 @@ How to use
 
 ### Setting your SDK
 
-After including sdk reference to your project you need to get your app key on [BLiP portal][1]. Choose the desired bot, go to the upper menu and access `Channels > Blip Chat`. On the `Setup` tab you will be able to get the required app key. You will also need to add your Android Application Id on the `Domains` section, in order to enable your chatbot in your app.
+After including the SDK reference in your project, you need to get your app key on [BLiP portal][1]. Choose the desired bot, go to the upper menu and access `Channels > Blip Chat`. On the `Setup` tab you will be able to get the required app key. You will also need to sign up your Android Application Id on the `Domains` section in order to enable your chatbot in your app.
 
 ### Opening the BLiP conversation widget
 
@@ -90,10 +90,9 @@ public class MainActivity extends AppCompatActivity {
 
 ### Defining authentication type
 
-BLiP Chat android sdk supports three different user authentication types. It is possible to define which authentication method will be used to identify your client.
+BLiP Chat's Android SDK supports two user authentication types. It is possible to define which authentication method will be used to identify your client.
 
 * Not integrated - Users will receive a guest account to interact with the chatbot.
-<!-- * Login - Users will receive an account with his 'Name' and 'Email' (provided by the user) to interact with the chatbot. In this mode the users have not message history. -->
 * Integrated - Users will receive an account identified by developer to interact with the chatbot. User data must be provided passing a BlipOptions instance as parameter on *BlipClient.openThread* method. You can set 2 properties: `authConfig` and `account`.
 
 #Auth Config
@@ -106,9 +105,9 @@ BLiP Chat android sdk supports three different user authentication types. It is 
 
 *Required if on integrated auth type.
 
-To define what user authetication type use the AuthType enum on authType property of BlipOptions. Possible values for authType are: `AuthType.GUEST` (Not integrated) and `AuthType.DEV` (Integrated).
+To define the user authetication type, use the AuthType enum on authType property of BlipOptions. Possible values for authType are: `AuthType.GUEST` (Not integrated) and `AuthType.DEV` (Integrated).
 
-Note: Guest type will be used as default If you do not define 'authType'.
+Note: `AuthType.GUEST` will be used if 'authType' is not defined.
 
 #Account
 
