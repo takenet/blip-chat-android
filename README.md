@@ -95,7 +95,7 @@ BLiP Chat's Android SDK supports two user authentication types. It is possible t
 * Not integrated - Users will receive a guest account to interact with the chatbot.
 * Integrated - Users will receive an account identified by developer to interact with the chatbot. User data must be provided passing a BlipOptions instance as parameter on *BlipClient.openThread* method. You can set 2 properties: `authConfig` and `account`.
 
-#Auth Config
+*Auth Config
 
 | Property          | Description                          |
 | ----------------- | ------------------------------------ |
@@ -109,11 +109,11 @@ To define the user authetication type, use the AuthType enum on authType propert
 
 Note: `AuthType.GUEST` will be used if 'authType' is not defined.
 
-#Account
+*Account
 
 Check this [link](http://limeprotocol.org/resources.html#account) to see possible properties.
 
-#Example
+## Example
 
 ```java
 
