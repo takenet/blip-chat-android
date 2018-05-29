@@ -20,7 +20,7 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-chat:2.1.13'
+compile 'net.take:blip-chat:2.1.14'
 ```
 
 or Maven:
@@ -28,7 +28,7 @@ or Maven:
 <dependency>
   <groupId>net.take</groupId>
   <artifactId>blip-chat</artifactId>
-  <version>2.1.13</version>
+  <version>2.1.14</version>
   <type>pom</type>
 </dependency>
 ```
@@ -138,6 +138,37 @@ blipOptions.setAccount(account);
 
 BlipClient.openBlipThread(context, APP_KEY, blipOptions);
 
+```
+
+# Optional properties
+
+| Property          | Description                                             |
+| ----------------- | ------------------------------------------------------- |
+| Account           | Set the bot's user information                          |
+| HideMenu          | Show/hide chat menu                                     |
+
+## Example
+
+```java
+AuthConfig authConfig = new AuthConfig(AuthType.Dev, "luizpush@test.com","123456");
+
+Map<String, String> extras = new HashMap<>();
+String fcmUserToken = FirebaseInstanceId.getInstance().getToken();
+extras.put("#inbox.forwardTo", String.format("%s@firebase.gw.msging.net", fcmUserToken));
+
+Account account = new Account();
+account.setFullName("luizpush");
+account.setEmail("luizpush@gmail.com");
+account.setEncryptMessageContent(true);
+account.setExtras(extras);
+
+BlipOptions blipOptions = new BlipOptions();
+blipOptions.setAuthConfig(authConfig);
+blipOptions.setAccount(account);
+
+blipOptions.setHideMenu(true);
+
+BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
 ```
 
 ### Support
