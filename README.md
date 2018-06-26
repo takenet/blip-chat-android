@@ -20,7 +20,7 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-chat:2.1.14'
+compile 'net.take:blip-chat:2.1.16'
 ```
 
 or Maven:
@@ -28,7 +28,7 @@ or Maven:
 <dependency>
   <groupId>net.take</groupId>
   <artifactId>blip-chat</artifactId>
-  <version>2.1.14</version>
+  <version>2.1.16</version>
   <type>pom</type>
 </dependency>
 ```
@@ -57,6 +57,12 @@ How to use
 
  <application ...
 </manifest>
+```
+
+It is also necessary to add gson dependency to your app once BLiP Chat uses this library.
+
+```groovy
+implementation 'com.google.code.gson:gson:2.8.5'
 ```
 
 ### Setting your SDK
