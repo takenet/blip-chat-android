@@ -20,7 +20,7 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-compile 'net.take:blip-chat:2.1.21'
+implementation 'net.take:blip-chat:2.1.24'
 ```
 
 or Maven:
@@ -28,7 +28,7 @@ or Maven:
 <dependency>
   <groupId>net.take</groupId>
   <artifactId>blip-chat</artifactId>
-  <version>2.1.21</version>
+  <version>2.1.24</version>
   <type>pom</type>
 </dependency>
 ```
