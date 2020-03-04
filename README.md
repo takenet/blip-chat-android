@@ -128,8 +128,6 @@ import net.take.blipchat.BlipClient;
 import net.take.blipchat.models.AuthConfig;
 import net.take.blipchat.models.BlipOptions;
 
-import org.limeprotocol.messaging.resources.Account;
-
 ...
 
 AuthConfig authConfig = new AuthConfig(AuthType.Dev, "userId123PS","pass123PS");
