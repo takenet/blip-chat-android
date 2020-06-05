@@ -144,6 +144,38 @@ BlipClient.openBlipThread(context, APP_KEY, blipOptions);
 
 ```
 
+### Using Organization 
+
+To use organization in BLiP Chat's Android SDK, you must assign options to your organization's BLiP Chat URL.
+
+## Example
+
+```java
+
+import net.take.blipchat.AuthType;
+import net.take.blipchat.BlipClient;
+import net.take.blipchat.models.AuthConfig;
+import net.take.blipchat.models.BlipOptions;
+
+...
+
+AuthConfig authConfig = new AuthConfig(AuthType.Dev, "userId123PS","pass123PS");
+
+Account account = new Account();
+account.setFullName("User Name Android123");
+account.setEmail("test@android.com");
+
+BlipOptions blipOptions = new BlipOptions();
+blipOptions.setAuthConfig(authConfig);
+blipOptions.setAccount(account);
+
+blipOptions.setCustomCommonUrl("https://take.chat.blip.ai/"); // Use the organization chat url
+
+BlipClient.openBlipThread(context, APP_KEY, blipOptions);
+
+```
+
+
 ## ProGuard
 
 Android apps that use [ProGuard](https://developer.android.com/studio/build/shrink-code) to obfuscate code need to add an exception in file `proguard-rules.pro` to not obfuscate the BLiP Chat code, otherwise, some BLiP Chat classes may not work properly which makes it impossible to open the chat.
