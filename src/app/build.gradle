@@ -23,11 +23,11 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
-            buildConfigField 'String', 'APPKEY', '"YmxpcGNoYXRwb3J0YWw6ODZjNDJlODYtMTg0OC00ZjQ1LTgxZDctNTc4ZjNjYjhjMmYy"'
+            buildConfigField 'String', 'APPKEY', '"YOUR_APP_KEY_HERE"'
         }
         debug {
             minifyEnabled false
-            buildConfigField 'String', 'APPKEY', '"YmxpcGNoYXRwb3J0YWw6ODZjNDJlODYtMTg0OC00ZjQ1LTgxZDctNTc4ZjNjYjhjMmYy"'
+            buildConfigField 'String', 'APPKEY', '"YOUR_APP_KEY_HERE"'
         }
     }
 
