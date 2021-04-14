@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script type="text/javascript" src="%scriptSdkUrl%"></script>
+  <style>
+      html, body { width: 100%; height: 100%; margin: 0; }
+  </style>
+</head>
+
+<body id="sdkTarget">
+<script>
+       (function () {
+          window.onload = function () {
+             new BlipChat()
+                .withAppKey('%appKey%')
+                .withTarget('sdkTarget')
+                .withAuth(%authConfig%)
+                .withAccount(%account%)
+                .withConnectionData(%connectionData%)
+                .withCustomCommonUrl('%commonUrl%')
+                .build();
+              }
+        })();
+
+        function setPresence(available) {
+            var setPresenceCode = available ? "SetPresenceAvailable" : "SetPresenceUnavailable";
+            var blipChatIframe = document.getElementById('blip-chat-iframe');
+            if (blipChatIframe && blipChatIframe.contentWindow) {
+                blipChatIframe.contentWindow.postMessage({ code: setPresenceCode }, "%blipChatUrl%");
+            }
+        }
+</script>
+</body>
+
+</html>

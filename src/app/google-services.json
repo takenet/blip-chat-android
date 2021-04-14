@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "646240129034",
+    "firebase_url": "https://blip-chat-test.firebaseio.com",
+    "project_id": "blip-chat-test",
+    "storage_bucket": "blip-chat-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646240129034:android:0059041a32f34bf4",
+        "android_client_info": {
+          "package_name": "net.take.blip_sdk_webview"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "646240129034-1a7gkkct3a2apa00c838kqj8sfjve4te.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.take.blip_sdk_webview",
+            "certificate_hash": "67447e78e037dd0d52cd833aae7c2abd25111549"
+          }
+        },
+        {
+          "client_id": "646240129034-02sl2bgu431ml76k33r40rugb5154e5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2-Uf3GnvGFyWecLRya7H1wqtO4EzBtI4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "646240129034-02sl2bgu431ml76k33r40rugb5154e5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

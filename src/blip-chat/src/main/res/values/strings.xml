@@ -1,0 +1,7 @@
+<resources>
+    <string name="blipchat_not_now">Not now</string>
+    <string name="blipchat_settings">Settings</string>
+    <string name="blipchat_permission_denied_permanently_dialog_title">Enable permissions</string>
+    <string name="blipchat_permission_denied_permanently_dialog_message">To send media, allow this application to use the camera, access your device\'s photos, media, and files. Tap Permissions and enable Storage and Camera.</string>
+    <string name="blipchat_file_chooser">File Chooser</string>
+</resources>

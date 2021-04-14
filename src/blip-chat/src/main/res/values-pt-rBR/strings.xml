@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="blipchat_not_now">Agora não</string>
+    <string name="blipchat_settings">Configurações</string>
+    <string name="blipchat_permission_denied_permanently_dialog_title">Habilitar permissões</string>
+    <string name="blipchat_permission_denied_permanently_dialog_message">Para enviar mídia, permita que o aplicativo utilize a câmera, acesse fotos, mídia e arquivos de seu aparelho. Toque em Permissões e ative o Armazenamento e a Câmera.</string>
+    <string name="blipchat_file_chooser">Seletor de arquivos</string>
+</resources>
