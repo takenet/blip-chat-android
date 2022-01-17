@@ -4,9 +4,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'BlipChatKey'
-            keyPassword 'T@k3n3t'
+            keyPassword 'PASSWORD'
             storeFile file('blip-chat-key.jks')
-            storePassword 'T@k3n3t'
+            storePassword 'PASSWORD'
         }
     }
     compileSdkVersion 26
