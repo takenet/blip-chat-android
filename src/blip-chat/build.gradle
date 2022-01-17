@@ -80,14 +80,9 @@ install {
                 }
                 developers {
                     developer {
-                        id 'takenet'
-                        name 'Take'
-                        email 'produtos.ti@take.net'
-                    }
-                    developer {
-                        id 'ravpacheco'
-                        name 'Rafael Pacheco'
-                        email 'ravpacheco@gmail.com'
+                        id 'DEVELOPER_ID'
+                        name 'NAME_DEVELOPER'
+                        email 'EMAIL@EMAIL.COM'
                     }
                 }
                 scm {
