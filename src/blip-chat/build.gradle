@@ -1,10 +1,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: "com.jfrog.bintray"
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
-// This is the library version used when deploying the artifact
-version = "2.1." + System.getenv("BUILD_NUMBER") as String ?: '-SNAPSHOT'
-
+// https://proandroiddev.com/publishing-android-libraries-to-mavencentral-in-2021-8ac9975c3e52
 android {
     compileSdkVersion 26
     defaultConfig {
@@ -57,85 +56,119 @@ dependencies {
 
 def siteUrl = 'https://github.com/takenet/blip-chat-android'      // Homepage URL of the library
 def gitUrl = 'https://github.com/takenet/blip-chat-android.git'   // Git repository URL
-group = "net.take"                                          // Maven Group ID for the artifact
 
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
 
-                // Add your description here
-                name 'net.take:blip-chat'
-                description = 'Add BLiP Chat widget in your Android app'
-                url siteUrl
+// TODO
+//install {
+//    repositories.mavenInstaller {
+//        // This generates POM.xml with proper parameters
+//        pom {
+//            project {
+//                packaging 'aar'
+//
+//                // Add your description here
+//                name 'net.take:blip-chat'
+//                description = 'Add BLiP Chat widget in your Android app'
+//                url siteUrl
+//
+//                // Set your license
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id 'DEVELOPER_ID'
+//                        name 'NAME_DEVELOPER'
+//                        email 'EMAIL@EMAIL.COM'
+//                    }
+//                }
+//                scm {
+//                    connection gitUrl
+//                    developerConnection gitUrl
+//                    url siteUrl
+//                }
+//            }
+//        }
+//    }
+//}
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // The coordinates of the library, being set from variables that
+                // we'll set up later
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
 
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
+                // Two artifacts, the `aar` (or `jar`) and the sources
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
                 }
-                developers {
-                    developer {
-                        id 'DEVELOPER_ID'
-                        name 'NAME_DEVELOPER'
-                        email 'EMAIL@EMAIL.COM'
+
+                artifact androidSourcesJar
+                artifact javadocJar
+
+                // Mostly self-explanatory metadata
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    description = 'Stream Chat official Android SDK'
+                    url = 'https://github.com/getstream/stream-chat-android'
+                    licenses {
+                        license {
+                            name = 'Stream License'
+                            url = 'https://github.com/GetStream/stream-chat-android/blob/main/LICENSE'
+                        }
                     }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
+                    developers {
+                        developer {
+                            id = 'zsmb13'
+                            name = 'Márton Braun'
+                            email = 'marton@getstream.io'
+                        }
+                        // Add all other devs here...
+                    }
+
+                    // Version control info - if you're using GitHub, follow the
+                    // format as seen here
+                    scm {
+                        connection = 'scm:git:github.com/getstream/stream-chat-android.git'
+                        developerConnection = 'scm:git:ssh://github.com/getstream/stream-chat-android.git'
+                        url = 'https://github.com/getstream/stream-chat-android/tree/main'
+                    }
                 }
             }
         }
     }
 }
-
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
 }
 
-//task javadoc(type: Javadoc) {
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//}
-//
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    classifier = 'javadoc'
-//    from javadoc.destinationDir
-//}
-//artifacts {
-//    archives javadocJar
-//}
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
-
-// https://github.com/bintray/gradle-bintray-plugin
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        // it is the name that appears in bintray when logged
-        name = "net.take:blip-chat" // TODO
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            gpg {
-                sign = true //Determines whether to GPG sign the files. The default is false
-                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
-            }
+nexusPublishing {
+    repositories {
+        sonatype {
+            /* Existing params here... */
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
     }
 }
+
+signing {
+    useInMemoryPgpKeys(
+            rootProject.ext["signing.keyId"],
+            rootProject.ext["signing.key"],
+            rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}
+
