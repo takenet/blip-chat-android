@@ -2,9 +2,9 @@ apply {
     plugin 'com.android.library'
     plugin 'signing'
     from '../shared_dependencies.gradle'
+    from "${rootProject.projectDir}/publish-module.gradle"
 }
 
-// https://proandroiddev.com/publishing-android-libraries-to-mavencentral-in-2021-8ac9975c3e52
 android {
     compileSdkVersion versions.compileSdkVersion
     buildToolsVersion versions.buildToolsVersion
@@ -35,6 +35,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    sourceSets.release {
+        res.srcDirs = ['res', 'src/blip-chat/res']
+        assets.srcDirs = ['src/blip-chat/assets', 'src/blip-chat/assets/']
+    }
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
@@ -44,15 +49,6 @@ android {
         unitTests.returnDefaultValues = true
     }
 }
-
-dependencies {
-
-}
-
-//Reference: https://gist.github.com/lopspower/6f62fe1492726d848d6d
-
-def siteUrl = 'https://github.com/takenet/blip-chat-android'      // Homepage URL of the library
-def gitUrl = 'https://github.com/takenet/blip-chat-android.git'   // Git repository URL
 
 
 // TODO
