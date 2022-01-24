@@ -18,6 +18,11 @@ jobs:
         distribution: adopt
         java-version: 1.8
 
+      - name: Change Version
+        run: |
+          sed 's/appVersion [0-9a-zA-Z -_]*/appVersion:'${{ github.run_number }},'/' build.gradle  > increase.txt
+          cat increase.txt > build.gradle
+
         # Builds the release artifacts of the library
       - name: Release build
         run: ./gradlew :blip-chat:assembleRelease

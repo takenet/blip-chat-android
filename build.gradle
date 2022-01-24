@@ -25,16 +25,13 @@ allprojects {
 
 ext {
 
-    PUBLISH_GROUP_ID = 'net.blip'
-    PUBLISH_VERSION = '2.1.25'
-    PUBLISH_ARTIFACT_ID = 'blip-chat'
 
     versions = [
             compileSdkVersion: 31,
             minSdkVersion    : 19,
             targetSdkVersion : 31,
             appVersion       : 1,
-            versionName      : "2.0",
+            versionName      : "2.3.",
             buildToolsVersion: "30.0.3",
             groupId: 'blip-chat',
             artifactId: 'net.blip',
