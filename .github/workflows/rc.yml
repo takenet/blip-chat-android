@@ -20,7 +20,7 @@ jobs:
 
         # Builds the release artifacts of the library
       - name: Release build
-        run: ./gradlew :stream-chat-android-client:assembleRelease
+        run: ./gradlew :blip-chat:assembleRelease
 
 
         # Runs upload, and then closes & releases the repository
