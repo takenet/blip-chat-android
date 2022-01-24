@@ -1,0 +1,24 @@
+dependencies {
+    // Android X
+    implementation 'androidx.core:core:1.7.0'
+    implementation "androidx.appcompat:appcompat:1.4.1"
+
+    // File tree
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // FB
+    implementation 'com.google.firebase:firebase-messaging:23.0.0'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Test stuff
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation "org.robolectric:robolectric:3.1"
+}
