@@ -1,0 +1,54 @@
+apply {
+    plugin 'com.android.application'
+    from '../shared_dependencies.gradle'
+}
+
+android {
+    signingConfigs {
+        config {
+            keyAlias 'BlipChatKey'
+            keyPassword 'PASSWORD'
+            storeFile file('blip-chat-key.jks')
+            storePassword 'PASSWORD'
+        }
+    }
+
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
+    defaultConfig {
+        applicationId "net.take.blip_sdk_webview"
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
+        versionCode versions.appVersion
+        versionName versions.versionName + versionCode
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+            buildConfigField 'String', 'APPKEY', '"YOUR_APP_KEY_HERE"'
+        }
+        debug {
+            minifyEnabled false
+            buildConfigField 'String', 'APPKEY', '"YOUR_APP_KEY_HERE"'
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation project(':blip-chat')
+}
+
+apply plugin: 'com.google.gms.google-services'

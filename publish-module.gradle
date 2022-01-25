@@ -1,0 +1,47 @@
+apply plugin: 'com.android.library'
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+}
+artifacts {
+    archives androidSourcesJar
+}
+
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // The coordinates of the library, being set from variables that
+                // we'll set up later
+                groupId versions.groupId
+                artifactId versions.artifactId
+                version versions.versionName + versions.appVersion
+
+                // Two artifacts, the `aar` (or `jar`) and the sources
+                if (project.plugins.findPlugin("com.android.library")) { from components.release}
+                else {from components.java}
+
+                artifact androidSourcesJar
+                // Mostly self-explanatory metadata
+                pom {
+                    name = versions.artifactId
+                    description = versions.description
+                    url = versions.siteUrl
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            rootProject.ext["signing.keyId"],
+            rootProject.ext["signing.key"],
+            rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}
+

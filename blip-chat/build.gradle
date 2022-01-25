@@ -1,0 +1,51 @@
+apply {
+    plugin 'com.android.library'
+    plugin 'signing'
+    from '../shared_dependencies.gradle'
+    from "${rootProject.projectDir}/publish-module.gradle"
+}
+
+android {
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
+    defaultConfig {
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
+        versionCode versions.appVersion
+        versionName versions.versionName + versionCode
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+
+    buildTypes {
+        release {
+            buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://unpkg.com/blip-chat-widget"'
+            buildConfigField 'String', 'BLIP_CHAT_URL', '"https://chat.blip.ai/"'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://takenetomni.blob.core.windows.net/media-db/blip-chat-widget-hmg.js"'
+            buildConfigField 'String', 'BLIP_CHAT_URL', '"https://hmg-chat.blip.ai/"'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets.release {
+        res.srcDirs = ['res', 'src/blip-chat/res']
+        assets.srcDirs = ['src/blip-chat/assets', 'src/blip-chat/assets/']
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
