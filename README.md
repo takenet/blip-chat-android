@@ -20,15 +20,16 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-implementation 'net.take:blip-chat:2.1.24'
+implementation 'io.github.takenet:blipchat:2.1.25.2'
 ```
+
 
 or Maven:
 ```xml
 <dependency>
-  <groupId>net.take</groupId>
-  <artifactId>blip-chat</artifactId>
-  <version>2.1.24</version>
+  <groupId>io.github.takenet</groupId>
+  <artifactId>blipchat</artifactId>
+  <version>2.1.25.2</version>
   <type>pom</type>
 </dependency>
 ```
@@ -36,6 +37,8 @@ or Maven:
 or download [the latest JAR][3] and import into your app.
 
 Snapshots of the development version are available at [Sonatype's `snapshots` repository][snap].
+
+https://mvnrepository.com/artifact/io.github.takenet/blipchat
 
 How to use
 -------------------------
