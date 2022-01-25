@@ -13,7 +13,7 @@ Add the jcenter maven repository reference to build.gradle file of your project
 allprojects {
     repositories {
         //others repository dependencies
-        jcenter()
+        mavenCentral()
     }
 }
 ```
