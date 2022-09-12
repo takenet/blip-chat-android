@@ -6,10 +6,10 @@ apply plugin: "com.jfrog.bintray"
 version = "2.1." + System.getenv("BUILD_NUMBER") as String ?: '-SNAPSHOT'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 33
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 33
         versionCode 1
         versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
