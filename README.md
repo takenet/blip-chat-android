@@ -20,7 +20,7 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-implementation 'io.github.takenet:blipchat:2.1.25.5'
+implementation 'io.github.takenet:blipchat:3.0.00.0'
 ```
 
 
@@ -29,7 +29,7 @@ or Maven:
 <dependency>
   <groupId>io.github.takenet</groupId>
   <artifactId>blipchat</artifactId>
-  <version>2.1.25.5</version>
+  <version>3.0.00.0</version>
   <type>pom</type>
 </dependency>
 ```
