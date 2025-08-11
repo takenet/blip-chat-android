@@ -2,9 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sdk.iml" filepath="$PROJECT_DIR$/.idea/modules/sdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/sdk.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/sdk.app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/blip-chat/sdk.blip-chat.iml" filepath="$PROJECT_DIR$/.idea/modules/blip-chat/sdk.blip-chat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/src.iml" filepath="$PROJECT_DIR$/.idea/modules/src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/src.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/src.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/src.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/src.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/src.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/src.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/src.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/src.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.iml" filepath="$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.main.iml" filepath="$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/blip-chat/src.blip-chat.unitTest.iml" />
     </modules>
   </component>
 </project>

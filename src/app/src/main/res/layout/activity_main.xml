@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context="net.take.blip_sdk_webview.SandboxAppActivity">
 
-
     <Button
         android:id="@+id/buttonGuest"
         android:layout_width="wrap_content"

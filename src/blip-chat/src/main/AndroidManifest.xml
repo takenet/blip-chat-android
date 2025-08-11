@@ -6,7 +6,8 @@
         android:allowBackup="true"
         android:supportsRtl="true">
         <activity
-            android:name=".activities.ThreadActivity" />
+            android:name=".activities.ThreadActivity"
+            android:windowSoftInputMode="adjustResize" />
         <provider
             android:name="net.take.blipchat.providers.BlipChatProvider"
             android:authorities="${applicationId}.blipchat.fileprovider"

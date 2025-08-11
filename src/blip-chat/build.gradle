@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: "com.jfrog.bintray"
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -100,30 +99,11 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+def gradlePropsFile = project.rootProject.file('gradle.properties')
 Properties properties = new Properties()
-properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
 
-// https://github.com/bintray/gradle-bintray-plugin
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        // it is the name that appears in bintray when logged
-        name = "net.take:blip-chat" // TODO
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            gpg {
-                sign = true //Determines whether to GPG sign the files. The default is false
-                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
-            }
-        }
-    }
+if (gradlePropsFile.exists()) {
+    properties.load(gradlePropsFile.newDataInputStream())
 }
 
 task androidSourcesJar(type: Jar) {
