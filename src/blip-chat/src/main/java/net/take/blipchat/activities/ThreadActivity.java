@@ -116,6 +116,10 @@ public class ThreadActivity extends AppCompatActivity implements ThreadActivityL
         pageContent = getHtmlPageContent();
 
         webview.loadDataWithBaseURL(baseUrl, pageContent, "text/html; charset=UTF-8", null, null);
+
+        // Load the user-specified URL directly in the WebView
+        // String customUrl = "https://compliance-take.chat.blip.ai/?appKey=c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=";
+        // webview.loadUrl(customUrl);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

@@ -50,10 +50,16 @@ public class SandboxAppActivity extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     BlipOptions blipOptions = new BlipOptions();
-                    blipOptions.setCustomCommonUrl("https://chat.blip.ai/");
+
                     blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
-                    //BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
-                    BlipClient.openBlipThread(SandboxAppActivity.this, "YmxpcGNoYXRwb3J0YWw6ODZjNDJlODYtMTg0OC00ZjQ1LTgxZDctNTc4ZjNjYjhjMmYy" , blipOptions);
+
+                    // blipOptions.setCustomCommonUrl("https://hmg-chat.blip.ai/");
+                    // BlipClient.openBlipThread(SandboxAppActivity.this, "d2hhdHNhcHBjbG91ZGFwaTo3NGUxNTI3MS0wOTU0LTQ3Y2UtYjBmNS0xNDI0ZGQyNjU2NDk=" , blipOptions);
+
+                    blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                    BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
+
+                    // BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }

@@ -1,11 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: "com.jfrog.bintray"
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 // This is the library version used when deploying the artifact
-version = "2.1." + System.getenv("BUILD_NUMBER") as String ?: '-SNAPSHOT'
+version = "3.0." + System.getenv("BUILD_NUMBER") as String ?: '-SNAPSHOT'
 
 android {
     compileSdkVersion 33
@@ -100,30 +99,11 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
+def gradlePropsFile = project.rootProject.file('gradle.properties')
 Properties properties = new Properties()
-properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
 
-// https://github.com/bintray/gradle-bintray-plugin
-bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
-
-    configurations = ['archives']
-    pkg {
-        repo = "maven"
-        // it is the name that appears in bintray when logged
-        name = "net.take:blip-chat" // TODO
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            gpg {
-                sign = true //Determines whether to GPG sign the files. The default is false
-                passphrase = properties.getProperty("bintray.gpg.password") //Optional. The passphrase for GPG signing'
-            }
-        }
-    }
+if (gradlePropsFile.exists()) {
+    properties.load(gradlePropsFile.newDataInputStream())
 }
 
 task androidSourcesJar(type: Jar) {
@@ -137,7 +117,7 @@ artifacts {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.takenet'
-    PUBLISH_VERSION = '2.1.25.5'
+    PUBLISH_VERSION = '3.0.00.0'
     PUBLISH_ARTIFACT_ID = 'blipchat'
     PUBLISH_DESCRIPTION = 'BlipChat Android SDK'
     PUBLISH_URL = 'https://github.com/takenet/blip-chat-android'
