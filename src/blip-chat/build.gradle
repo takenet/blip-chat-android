@@ -117,7 +117,7 @@ artifacts {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.takenet'
-    PUBLISH_VERSION = '3.0.00.0'
+    PUBLISH_VERSION = '2.1.25.5'
     PUBLISH_ARTIFACT_ID = 'blipchat'
     PUBLISH_DESCRIPTION = 'BlipChat Android SDK'
     PUBLISH_URL = 'https://github.com/takenet/blip-chat-android'

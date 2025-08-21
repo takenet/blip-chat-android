@@ -4,6 +4,10 @@ BLiP Chat for Android
 
 SDK to easily add BLiP Chat's widget to your Android app. For more information, see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
 
+> **🚨 Important Notice**
+>
+> **Do not use any of the `3.0.00.X` versions.** Please use the latest stable release: `2.1.25.5`. The `3.X` versions are unstable and may cause critical issues in your application.
+
 Installation
 --------
 
@@ -20,7 +24,7 @@ allprojects {
 
 Grab jar via Gradle:
 ```groovy
-implementation 'io.github.takenet:blipchat:3.0.00.0'
+implementation 'io.github.takenet:blipchat:2.1.25.5'
 ```
 
 
@@ -29,7 +33,7 @@ or Maven:
 <dependency>
   <groupId>io.github.takenet</groupId>
   <artifactId>blipchat</artifactId>
-  <version>3.0.00.0</version>
+  <version>2.1.25.5</version>
   <type>pom</type>
 </dependency>
 ```
