@@ -52,6 +52,7 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     testImplementation 'junit:junit:4.12'
     implementation 'com.google.code.gson:gson:2.8.5'
+    // implementation 'io.github.takenet:blipchat:2.1.25.5'
     implementation project(':blip-chat')
 }
 
