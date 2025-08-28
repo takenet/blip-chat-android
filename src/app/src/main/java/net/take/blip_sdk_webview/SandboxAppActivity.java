@@ -21,7 +21,6 @@ import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.models.Account;
 import net.take.blipchat.models.AuthConfig;
 import net.take.blipchat.models.BlipOptions;
-import net.take.blipchat.models.ConnectionDataConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SandboxAppActivity extends AppCompatActivity {
-
 
     private static final int TAKE_PICTURE_REQUEST = 101;
     private String filePath;
@@ -52,15 +50,11 @@ public class SandboxAppActivity extends AppCompatActivity {
                     BlipOptions blipOptions = new BlipOptions();
 
                     blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
-
-                    // blipOptions.setCustomCommonUrl("https://hmg-chat.blip.ai/");
-                    // BlipClient.openBlipThread(SandboxAppActivity.this, "d2hhdHNhcHBjbG91ZGFwaTo3NGUxNTI3MS0wOTU0LTQ3Y2UtYjBmNS0xNDI0ZGQyNjU2NDk=" , blipOptions);
-
                     blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
                     BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
-
-                    // BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
-                } catch (IllegalArgumentException e) {
+                    //BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
+                
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -86,12 +80,14 @@ public class SandboxAppActivity extends AppCompatActivity {
                     BlipOptions blipOptions = new BlipOptions();
                     blipOptions.setAuthConfig(authConfig);
                     blipOptions.setAccount(account);
-                    blipOptions.setCustomWidgetUrl("https://pagseguro-cdn.blip.ai/web/blip-chat.js");
-                    blipOptions.setCustomCommonUrl("https://pagseguro.chat.blip.ai");
-                    blipOptions.setConnectionDataConfig(new ConnectionDataConfig("0mn.io","pagseguro-ws.0mn.io","443"));
+                    //blipOptions.setCustomWidgetUrl("https://contrato-cdn.blip.ai/web/blip-chat.js");
+                    //blipOptions.setConnectionDataConfig(new ConnectionDataConfig("0mn.io","contrato-ws.0mn.io","443"));
 
-                    BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
-                } catch (IllegalArgumentException e) {
+                    blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                    BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
+                    //BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
+                
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

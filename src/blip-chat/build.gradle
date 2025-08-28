@@ -24,7 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug{
-            buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://takenetomni.blob.core.windows.net/media-db/blip-chat-widget-hmg.js"'
+            buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://unpkg.com/blip-chat-widget"'
             buildConfigField 'String', 'BLIP_CHAT_URL', '"https://hmg-chat.blip.ai/"'
         }
     }
@@ -111,13 +111,35 @@ task androidSourcesJar(type: Jar) {
     from android.sourceSets.main.java.source
 }
 
+task androidJavadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.source
+    classpath += files(android.getBootClasspath().join(File.pathSeparator))
+    options.addStringOption('Xdoclint:none', '-quiet')  // desativa warnings
+    exclude 'android/support/**'  // exclui pacotes problemáticos
+}
+
+task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
+    archiveClassifier.set('javadoc')
+    from androidJavadoc.destinationDir
+}
+
+task javaJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    // ou, para classes compiladas, você pode usar:
+    from('build/intermediates/javac/release/classes') // caminho varia conforme versão Android Gradle Plugin
+    archiveBaseName.set('blipchat')
+    archiveVersion.set('3.0.00.6')
+}
+
 artifacts {
     archives androidSourcesJar
+    archives androidJavadocJar
+    archives javaJar
 }
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.takenet'
-    PUBLISH_VERSION = '2.1.25.5'
+    PUBLISH_VERSION = '3.0.00.6'
     PUBLISH_ARTIFACT_ID = 'blipchat'
     PUBLISH_DESCRIPTION = 'BlipChat Android SDK'
     PUBLISH_URL = 'https://github.com/takenet/blip-chat-android'
@@ -159,7 +181,8 @@ if (secretPropsFile.exists()) {
 
 publishing {
     publications {
-        release(MavenPublication) {
+        mavenJava(MavenPublication) {
+
             // The coordinates of the library, being set from variables that
             // we'll set up in a moment
             groupId PUBLISH_GROUP_ID
@@ -167,10 +190,11 @@ publishing {
             version PUBLISH_VERSION
 
             // Two artifacts, the `aar` and the sources
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact("$buildDir/outputs/aar/${project.getName()}-${version}.aar")
             artifact androidSourcesJar
+            artifact androidJavadocJar
+            artifact javaJar
 
-            // Self-explanatory metadata for the most part
             pom {
                 name = PUBLISH_ARTIFACT_ID
                 description = 'Blip chat SDK'
@@ -211,27 +235,98 @@ publishing {
         }
     }
     repositories {
-        // The repository to publish to, Sonatype/MavenCentral
         maven {
-            // This is an arbitrary name, you may also use "mavencentral" or
-            // any other name that's descriptive for you
-            name = "sonatype"
+            url = uri('file://' + new File(buildDir, 'repo'))
+        }
+    }
+}
 
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            // You only need this if you want to publish snapshots, otherwise just set the URL
-            // to the release repo directly
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+import java.security.MessageDigest
 
-            // The username and password we've fetched earlier
-            credentials {
-                username ossrhUsername
-                password ossrhPassword
+def hashAlgorithms = ['MD5', 'SHA-1', 'SHA-256', 'SHA-512']
+
+def generateChecksum(File file, String algorithm) {
+    MessageDigest digest = MessageDigest.getInstance(algorithm)
+    file.withInputStream { is ->
+        byte[] buffer = new byte[8192]
+        int read = 0
+        while ((read = is.read(buffer)) > 0) {
+            digest.update(buffer, 0, read)
+        }
+    }
+    return digest.digest().encodeHex().toString()
+}
+
+task generateChecksums {
+    dependsOn 'assembleRelease' // Garante que o AAR já está pronto
+    doLast {
+        def aarFile = file("$buildDir/outputs/aar/${project.getName()}-${PUBLISH_VERSION}.aar")
+        if (!aarFile.exists()) {
+            throw new GradleException("Arquivo AAR não encontrado: ${aarFile}")
+        }
+        hashAlgorithms.each { algo ->
+            def checksum = generateChecksum(aarFile, algo)
+            def checksumFile = new File(aarFile.parent, "${aarFile.name}.${algo.toLowerCase().replaceAll('-', '')}")
+            checksumFile.text = checksum
+            println "Gerado checksum ${algo} para ${aarFile.name} em ${checksumFile.name}"
+        }
+    }
+}
+
+task generateAscChecksums {
+    dependsOn 'publish' // publish gera os arquivos assinados (.asc)
+    doLast {
+        def repoDir = file("$buildDir/repo/${PUBLISH_GROUP_ID.replace('.', '/')}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}")
+        if (!repoDir.exists()) {
+            throw new GradleException("Diretório do repositório local não encontrado: ${repoDir}")
+        }
+
+        repoDir.eachFileMatch(~/.+\.asc$/) { File ascFile ->
+            hashAlgorithms.each { algo ->
+                def checksum = generateChecksum(ascFile, algo)
+                def checksumFile = new File(ascFile.parent, "${ascFile.name}.${algo.toLowerCase().replaceAll('-', '')}")
+                checksumFile.text = checksum
+                println "Gerado checksum ${algo} para arquivo ${ascFile.name} em ${checksumFile.name}"
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    def versionName = android.defaultConfig.versionName
+    def buildType = "release"
+    def aarDir = "$buildDir/outputs/aar"
+    def originalAar = file("$aarDir/${project.name}-${buildType}.aar")
+    def renamedAar = file("$aarDir/${project.name}-${PUBLISH_VERSION}.aar")
+
+    tasks.register("renameAar") {
+        dependsOn "assembleRelease"
+        doLast {
+            if (originalAar.exists()) {
+                println "Renomeando ${originalAar.name} para ${renamedAar.name}"
+                originalAar.renameTo(renamedAar)
+            } else {
+                println "Arquivo original não encontrado: ${originalAar}"
             }
         }
     }
 }
 
 signing {
-    sign publishing.publications
+    sign publishing.publications.mavenJava
 }
+
+//Para gerar os arquivos conforme a doc: https://central.sonatype.org/publish/publish-portal-upload/
+// no terminal do Android Studio execute:
+
+/*
+
+./gradlew :blip-chat:assembleRelease
+./gradlew :blip-chat:renameAar
+./gradlew :blip-chat:generateChecksums
+./gradlew :blip-chat:generateAscChecksums
+./gradlew blip-chat:publishMavenJavaPublicationToMavenRepository
+ */
+
+// Os arquivos estarão em:
+// .....blip-chat-android\src\blip-chat\build\repo\io\github\takenet\blipchat\3.0.00.6

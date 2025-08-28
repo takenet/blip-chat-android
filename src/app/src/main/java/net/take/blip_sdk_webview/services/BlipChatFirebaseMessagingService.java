@@ -15,6 +15,8 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
+import net.take.blip_sdk_webview.R;
+
 public class BlipChatFirebaseMessagingService extends FirebaseMessagingService {
 
     private final String TAG = BlipChatFirebaseMessagingService.class.getCanonicalName();
