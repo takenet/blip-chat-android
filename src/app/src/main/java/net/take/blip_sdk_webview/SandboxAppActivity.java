@@ -21,7 +21,6 @@ import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.models.Account;
 import net.take.blipchat.models.AuthConfig;
 import net.take.blipchat.models.BlipOptions;
-import net.take.blipchat.models.ConnectionDataConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,9 +49,9 @@ public class SandboxAppActivity extends AppCompatActivity {
                 try {
                     BlipOptions blipOptions = new BlipOptions();
 
-                    blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));                    
-                    blipOptions.setCustomCommonUrl("https://compliance-hmg-5grep.hmg-chat.blip.ai/");
-                    BlipClient.openBlipThread(SandboxAppActivity.this, "Y2hhbm5lbHNyY3NobWc6ZGVjYjhmZWMtOGFkNy00M2RiLTlhZGEtMjdiNDBhN2MwNWE2" , blipOptions);
+                    blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
+                    blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                    BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
                     //BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
                 
                 } catch (Exception e) {
@@ -84,8 +83,8 @@ public class SandboxAppActivity extends AppCompatActivity {
                     //blipOptions.setCustomWidgetUrl("https://contrato-cdn.blip.ai/web/blip-chat.js");
                     //blipOptions.setConnectionDataConfig(new ConnectionDataConfig("0mn.io","contrato-ws.0mn.io","443"));
 
-                    blipOptions.setCustomCommonUrl("https://compliance-hmg-5grep.hmg-chat.blip.ai/");
-                    BlipClient.openBlipThread(SandboxAppActivity.this, "Y2hhbm5lbHNyY3NobWc6ZGVjYjhmZWMtOGFkNy00M2RiLTlhZGEtMjdiNDBhN2MwNWE2" , blipOptions);
+                    blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                    BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
                     //BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
                 
                 } catch (Exception e) {
