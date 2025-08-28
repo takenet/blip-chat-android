@@ -43,4 +43,4 @@ captures/
 *.jks
 
 # Certificates
-.certificates
+src/certificates/
