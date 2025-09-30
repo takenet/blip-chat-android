@@ -7,13 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import net.take.blipchat.AuthType;
 import net.take.blipchat.BlipClient;
@@ -74,8 +74,18 @@ public class SandboxAppActivity extends AppCompatActivity {
                     AuthConfig authConfig = new AuthConfig(AuthType.Dev, "testereconnect1@test.com","123456");
 
                     Map<String, String> extras = new HashMap<>();
-                    String fcmUserToken = FirebaseInstanceId.getInstance().getToken();
-                    extras.put("#inbox.forwardTo", String.format("%s@firebase.gw.msging.net", fcmUserToken));
+                    
+                    FirebaseMessaging.getInstance().getToken()
+                        .addOnCompleteListener(task -> {
+                            if (!task.isSuccessful()) {
+                                Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+                                return;
+                            }
+
+                            String fcmUserToken = task.getResult();
+                            Log.d("FCM", "FCM Registration Token: " + fcmUserToken);
+                            extras.put("#inbox.forwardTo", String.format("%s@firebase.gw.msging.net", fcmUserToken));
+                        });
 
                     Account account = new Account();
                     account.setFullName("Teste reconnect 1");

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'net.take.blip_sdk_webview'
     signingConfigs {
         config {
             keyAlias 'BlipChatKey'
@@ -9,14 +10,14 @@ android {
             storePassword 'PASSWORD'
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion 33
     defaultConfig {
         applicationId "net.take.blip_sdk_webview"
-        minSdkVersion 15
-        targetSdkVersion 26
+        minSdkVersion 19
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -42,17 +43,15 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-messaging:15.0.2'
+    implementation 'com.google.firebase:firebase-messaging:23.2.1'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
+    testImplementation 'junit:junit:4.13.2'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation project(':blip-chat')
+    // implementation project(':blip-chat')
+    implementation 'io.github.takenet:blipchat:3.0.00.7'
 }
 
 apply plugin: 'com.google.gms.google-services'

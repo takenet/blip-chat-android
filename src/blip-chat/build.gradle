@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -52,52 +51,7 @@ dependencies {
     testImplementation "org.robolectric:robolectric:3.1"
 }
 
-//Reference: https://gist.github.com/lopspower/6f62fe1492726d848d6d
 
-def siteUrl = 'https://github.com/takenet/blip-chat-android'      // Homepage URL of the library
-def gitUrl = 'https://github.com/takenet/blip-chat-android.git'   // Git repository URL
-group = "net.take"                                          // Maven Group ID for the artifact
-
-install {
-    repositories.mavenInstaller {
-        // This generates pom.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-
-                // Add your description here
-                name 'net.take:blip-chat'
-                description = 'Add BLiP Chat widget in your Android app'
-                url siteUrl
-
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'DEVELOPER_ID'
-                        name 'NAME_DEVELOPER'
-                        email 'EMAIL@EMAIL.COM'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
 
 def gradlePropsFile = project.rootProject.file('gradle.properties')
 Properties properties = new Properties()
@@ -117,7 +71,7 @@ artifacts {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.takenet'
-    PUBLISH_VERSION = '2.1.25.5'
+    PUBLISH_VERSION = '3.0.00.7'
     PUBLISH_ARTIFACT_ID = 'blipchat'
     PUBLISH_DESCRIPTION = 'BlipChat Android SDK'
     PUBLISH_URL = 'https://github.com/takenet/blip-chat-android'
@@ -139,6 +93,7 @@ ext["signing.password"] = ''
 ext["signing.secretKeyRingFile"] = ''
 ext["ossrhUsername"] = ''
 ext["ossrhPassword"] = ''
+ext["osshBearerToken"] = ''
 
 File secretPropsFile = project.rootProject.file('local.properties')
 if (secretPropsFile.exists()) {
@@ -155,6 +110,7 @@ if (secretPropsFile.exists()) {
     ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE')
     ext["ossrhUsername"] = System.getenv('OSSRH_USERNAME')
     ext["ossrhPassword"] = System.getenv('OSSRH_PASSWORD')
+    ext["osshBearerToken"] = System.getenv('OSSH_BEARER_TOKEN')
 }
 
 publishing {
@@ -211,22 +167,15 @@ publishing {
         }
     }
     repositories {
-        // The repository to publish to, Sonatype/MavenCentral
         maven {
-            // This is an arbitrary name, you may also use "mavencentral" or
-            // any other name that's descriptive for you
-            name = "sonatype"
-
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            // You only need this if you want to publish snapshots, otherwise just set the URL
-            // to the release repo directly
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-            // The username and password we've fetched earlier
+            name = "central"
+            url = "https://central.sonatype.com/api/v1/publisher/upload"
             credentials {
                 username ossrhUsername
                 password ossrhPassword
+            }
+            authentication {
+                basic(BasicAuthentication)
             }
         }
     }
@@ -234,4 +183,80 @@ publishing {
 
 signing {
     sign publishing.publications
+}
+
+// Task to generate checksums
+task generateChecksums {
+    dependsOn 'publishReleasePublicationToMavenLocal'
+    
+    doLast {
+        def localRepo = "${System.getProperty('user.home')}/.m2/repository"
+        def groupPath = PUBLISH_GROUP_ID.replace('.', '/')
+        def artifactPath = "${localRepo}/${groupPath}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
+        
+        // Find all files in the directory
+        fileTree(artifactPath).each { file ->
+            if (file.isFile() && !file.name.endsWith('.md5') && !file.name.endsWith('.sha1')) {
+                def fileName = file.name
+                
+                // Generate MD5
+                def md5 = java.security.MessageDigest.getInstance("MD5")
+                file.eachByte(4096) { bytes, size ->
+                    md5.update(bytes, 0, size)
+                }
+                def md5Hash = md5.digest().collect { String.format("%02x", it) }.join()
+                new File(file.parent, "${fileName}.md5").text = md5Hash
+                
+                // Generate SHA1
+                def sha1 = java.security.MessageDigest.getInstance("SHA-1")
+                file.eachByte(4096) { bytes, size ->
+                    sha1.update(bytes, 0, size)
+                }
+                def sha1Hash = sha1.digest().collect { String.format("%02x", it) }.join()
+                new File(file.parent, "${fileName}.sha1").text = sha1Hash
+                
+                println "Checksums generated for: ${fileName}"
+            }
+        }
+    }
+}
+
+// Task to generate bundle for the new Sonatype Central
+task generateBundle(type: Zip) {
+    dependsOn 'generateChecksums'
+    
+    def localRepo = "${System.getProperty('user.home')}/.m2/repository"
+    def groupPath = PUBLISH_GROUP_ID.replace('.', '/')
+    def artifactPath = "${localRepo}/${groupPath}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
+    
+    // Include files with correct directory structure
+    from(artifactPath) {
+        into "${groupPath}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
+        include '**/*'
+    }
+    
+    archiveFileName = "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-bundle.zip"
+    destinationDirectory = file("${buildDir}/distributions")
+    
+    doLast {
+        println "Bundle generated at: ${destinationDirectory}/${archiveFileName.get()}"
+        println "Manual upload at: https://central.sonatype.com/publishing"
+    }
+}
+
+// Task to upload via new Central API
+task uploadToCentral {
+    dependsOn 'generateBundle'
+    
+    doLast {
+        def bundlePath = "${buildDir}/distributions/${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-bundle.zip"
+        def uploadUrl = "https://central.sonatype.com/api/v1/publisher/upload"
+        
+        exec {
+            commandLine 'curl', '-X', 'POST',
+                '-H', "Authorization: Bearer ${osshBearerToken}",
+                '-F', "bundle=@${bundlePath}",
+                uploadUrl
+        }
+    }
 }
