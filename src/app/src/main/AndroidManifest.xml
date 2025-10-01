@@ -9,13 +9,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".BlipSDKApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SandboxAppActivity"
-            android:exported="true">
+        <activity android:name=".SandboxAppActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +24,7 @@
         </activity>
 
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name="android.support.v4.content.FileProvider"
             android:authorities="net.take.blip_sdk_webview.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -33,15 +33,13 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <service android:name=".services.BlipChatFirebaseInstanceIDService"
-            android:exported="false">
+        <service android:name=".services.BlipChatFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
         <service
-            android:name=".services.BlipChatFirebaseMessagingService"
-            android:exported="false">
+            android:name=".services.BlipChatFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
