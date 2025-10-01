@@ -7,15 +7,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import net.take.blipchat.AuthType;
+import net.take.blipchat.BlipChatFragment;
 import net.take.blipchat.BlipClient;
 import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.models.Account;
@@ -32,9 +35,10 @@ import java.util.Map;
 
 public class SandboxAppActivity extends AppCompatActivity {
 
-
     private static final int TAKE_PICTURE_REQUEST = 101;
     private String filePath;
+    private FrameLayout fragmentContainer;
+    private BlipChatFragment currentChatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,10 @@ public class SandboxAppActivity extends AppCompatActivity {
         Button buttonGuest = (Button) findViewById(R.id.buttonGuest);
         Button buttonDev = (Button) findViewById(R.id.buttonDev);
         Button buttonTakePicture = (Button) findViewById(R.id.buttonTakePicture);
+        Button buttonFragment = (Button) findViewById(R.id.buttonFragment);
+        Button buttonHideFragment = (Button) findViewById(R.id.buttonHideFragment);
+        
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container);
 
         buttonGuest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +65,7 @@ public class SandboxAppActivity extends AppCompatActivity {
                     // BlipClient.openBlipThread(SandboxAppActivity.this, "d2hhdHNhcHBjbG91ZGFwaTo3NGUxNTI3MS0wOTU0LTQ3Y2UtYjBmNS0xNDI0ZGQyNjU2NDk=" , blipOptions);
 
                     blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
-                    BlipClient.openBlipThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
+                    BlipClient.openFullScreenThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
 
                     // BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
                 } catch (IllegalArgumentException e) {
@@ -90,7 +98,7 @@ public class SandboxAppActivity extends AppCompatActivity {
                     blipOptions.setCustomCommonUrl("https://pagseguro.chat.blip.ai");
                     blipOptions.setConnectionDataConfig(new ConnectionDataConfig("0mn.io","pagseguro-ws.0mn.io","443"));
 
-                    BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
+                    BlipClient.openFullScreenThread(SandboxAppActivity.this, BuildConfig.APPKEY, blipOptions);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }
@@ -137,6 +145,55 @@ public class SandboxAppActivity extends AppCompatActivity {
             }
         });
 
+        buttonFragment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEmbeddedChat();
+            }
+        });
+
+        buttonHideFragment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideEmbeddedChat();
+            }
+        });
+
+    }
+
+    private void showEmbeddedChat() {
+        if (currentChatFragment == null) {
+            try {
+                BlipOptions blipOptions = new BlipOptions();
+                blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
+                blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                
+                currentChatFragment = BlipClient.openEmbeddedThread("c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=", blipOptions);
+                
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, currentChatFragment, "chat_fragment");
+                transaction.commit();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        
+        fragmentContainer.setVisibility(View.VISIBLE);
+        
+        if (currentChatFragment != null) {
+            currentChatFragment.setPresence(true);
+        }
+    }
+    
+    private void hideEmbeddedChat() {
+        if (fragmentContainer != null) {
+            fragmentContainer.setVisibility(View.GONE);
+        }
+        
+        if (currentChatFragment != null) {
+            currentChatFragment.setPresence(false);
+        }
     }
 
     private File createImageFile() throws IOException{

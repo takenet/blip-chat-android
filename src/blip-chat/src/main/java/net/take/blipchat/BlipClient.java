@@ -15,19 +15,9 @@ import net.take.blipchat.utils.Constants;
 
 public final class BlipClient {
 
-    public static void openBlipThread(Context context, String appKey, BlipOptions blipOptions) throws IllegalArgumentException {
-
-        if (blipOptions == null || blipOptions.getAuthConfig() == null || blipOptions.getAuthConfig().getAuthType() == null) {
-            blipOptions = new BlipOptions();
-            blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
-        }
-
-        if (blipOptions.getConnectionDataConfig() == null){
-            blipOptions.setConnectionDataConfig(new ConnectionDataConfig());
-        }
-
-        validateSdkConfiguration(appKey, blipOptions);
-
+    public static void openFullScreenThread(Context context, String appKey, BlipOptions blipOptions) throws IllegalArgumentException {
+        blipOptions = getDefaultBlipOptions(appKey, blipOptions);
+        
         String json = new Gson().toJson(blipOptions);
         Intent intent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
@@ -38,12 +28,34 @@ public final class BlipClient {
         context.startActivity(intent);
     }
 
-    public static void openBlipThread(Context context, String appKey) throws IllegalArgumentException {
-        openBlipThread(context, appKey, null);
+    public static void openFullScreenThread(Context context, String appKey) throws IllegalArgumentException {
+        openFullScreenThread(context, appKey, null);
+    }
+
+    public static BlipChatFragment openEmbeddedThread(String appKey, BlipOptions blipOptions) throws IllegalArgumentException {
+        blipOptions = getDefaultBlipOptions(appKey, blipOptions);
+        return BlipChatFragment.newInstance(appKey, blipOptions);
+    }
+
+    public static BlipChatFragment openEmbeddedThread(String appKey) throws IllegalArgumentException {
+        return openEmbeddedThread(appKey, null);
+    }
+
+    private static BlipOptions getDefaultBlipOptions(String appKey, BlipOptions blipOptions) throws IllegalArgumentException {
+        if (blipOptions == null || blipOptions.getAuthConfig() == null || blipOptions.getAuthConfig().getAuthType() == null) {
+            blipOptions = new BlipOptions();
+            blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
+        }
+
+        if (blipOptions.getConnectionDataConfig() == null){
+            blipOptions.setConnectionDataConfig(new ConnectionDataConfig());
+        }
+
+        validateSdkConfiguration(appKey, blipOptions);
+        return blipOptions;
     }
 
     private static void validateSdkConfiguration(String appKey, BlipOptions blipOptions) {
-
         if (TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException("Argument appKey can't be null or empty.");
         }

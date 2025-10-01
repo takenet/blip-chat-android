@@ -2,52 +2,126 @@
 BLiP Chat for Android
 ======
 
-SDK to easily add BLiP Chat's widget to your Android app. For more information, see [BLiP portal][1] and [BLiP documentation][2]. See supported versions [here](#support).
+SDK to easily add BLiP Chat's widget to your Android app. For more information, see [BLiP portal][1] and [BLiP documentation][2]. 
 
-> **🚨 Important Notice**
->
-> **Do not use any of the `3.0.00.X` versions.** Please use the latest stable release: `2.1.25.5`. The `3.X` versions are unstable and may cause critical issues in your application.
+## 🆕 New in Latest Version
+
+This SDK now supports **two integration modes**:
+
+1. **Full Screen Mode** - Opens chat in a dedicated full-screen Activity (traditional approach)
+2. **Embedded Mode** - Returns a Fragment that can be embedded anywhere in your app (flexible approach)
+
+The embedded mode gives you **full control** over how and where the chat appears in your application.
 
 Installation
 --------
 
-Add the jcenter maven repository reference to build.gradle file of your project
+Add the Maven Central repository to your project's build.gradle:
 
 ```groovy
 allprojects {
     repositories {
-        //others repository dependencies
         mavenCentral()
     }
 }
 ```
 
-Grab jar via Gradle:
+Add the dependency:
 ```groovy
-implementation 'io.github.takenet:blipchat:2.1.25.5'
+implementation 'io.github.takenet:blipchat:3.0.0.7'
 ```
-
-
-or Maven:
-```xml
-<dependency>
-  <groupId>io.github.takenet</groupId>
-  <artifactId>blipchat</artifactId>
-  <version>2.1.25.5</version>
-  <type>pom</type>
-</dependency>
-```
-
-or download [the latest JAR][3] and import into your app.
-
-Snapshots of the development version are available at [Sonatype's `snapshots` repository][snap].
-
-https://mvnrepository.com/artifact/io.github.takenet/blipchat
 
 How to use
 -------------------------
 
-## Quick start
+## 🖥️ Full Screen Mode (Activity)
+
+Opens the chat in a dedicated full-screen Activity:
+
+```java
+// Basic usage
+BlipClient.openFullScreenThread(context, "your-app-key");
+
+// With custom options
+BlipOptions blipOptions = new BlipOptions();
+blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
+BlipClient.openFullScreenThread(context, "your-app-key", blipOptions);
+```
+
+## 📱 Embedded Mode (Fragment) - **NEW!**
+
+Returns a Fragment that you can embed anywhere in your app:
+
+```java
+// Create the chat fragment
+BlipChatFragment chatFragment = BlipClient.openEmbeddedThread("your-app-key");
+
+// Embed it in your layout
+getSupportFragmentManager().beginTransaction()
+    .replace(R.id.chat_container, chatFragment)
+    .commit();
+
+// Control presence manually (optional)
+chatFragment.setPresence(true);  // Set user as online
+chatFragment.setPresence(false); // Set user as offline
+```
+
+## 📋 Complete Example
+
+```java
+public class MainActivity extends AppCompatActivity {
+    
+    private BlipChatFragment chatFragment;
+    
+    private void openFullScreenChat() {
+        BlipOptions options = new BlipOptions();
+        options.setAuthConfig(new AuthConfig(AuthType.Guest));
+        
+        // Opens in full screen
+        BlipClient.openFullScreenThread(this, "your-app-key", options);
+    }
+    
+    private void showEmbeddedChat() {
+        if (chatFragment == null) {
+            // Create embedded chat
+            chatFragment = BlipClient.openEmbeddedThread("your-app-key");
+            
+            // Add to your layout
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.chat_container, chatFragment)
+                .commit();
+        }
+        
+        // Show the container
+        findViewById(R.id.chat_container).setVisibility(View.VISIBLE);
+        chatFragment.setPresence(true);
+    }
+    
+    private void hideEmbeddedChat() {
+        if (chatFragment != null) {
+            chatFragment.setPresence(false);
+        }
+        findViewById(R.id.chat_container).setVisibility(View.GONE);
+    }
+}
+```
+
+## 🎯 Key Benefits
+
+### Full Screen Mode
+- ✅ Simple integration
+- ✅ Complete chat experience
+- ✅ Handles all lifecycle automatically
+
+### Embedded Mode (NEW!)
+- ✅ **Full control** over chat placement
+- ✅ **Flexible** integration experience  
+- ✅ Embed in any layout or view hierarchy
+- ✅ Manual presence control
+- ✅ Perfect for chat-centric apps
+- ✅ Show/hide chat without navigation
+
+## 🔧 Advanced Configuration
 
 ### Prerequisites
 
