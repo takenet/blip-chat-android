@@ -187,6 +187,7 @@ signing {
 
 // Task to generate checksums
 task generateChecksums {
+    dependsOn 'assembleRelease'
     dependsOn 'publishReleasePublicationToMavenLocal'
     
     doLast {
