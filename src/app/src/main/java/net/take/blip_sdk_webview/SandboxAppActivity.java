@@ -64,8 +64,8 @@ public class SandboxAppActivity extends AppCompatActivity {
                     // blipOptions.setCustomCommonUrl("https://hmg-chat.blip.ai/");
                     // BlipClient.openBlipThread(SandboxAppActivity.this, "d2hhdHNhcHBjbG91ZGFwaTo3NGUxNTI3MS0wOTU0LTQ3Y2UtYjBmNS0xNDI0ZGQyNjU2NDk=" , blipOptions);
 
-                    blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
-                    BlipClient.openFullScreenThread(SandboxAppActivity.this, "c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=" , blipOptions);
+                    blipOptions.setCustomCommonUrl("https://compliance-c5a30.chat.blip.ai/");
+                    BlipClient.openFullScreenThread(SandboxAppActivity.this, "ZmFtb3NvdGFrZTpkNzg4MWVjZS0zYWIzLTQ4NTUtOTAwYi1hZTdmZmQxMWI1ZTc=" , blipOptions);
 
                     // BlipClient.openBlipThread(SandboxAppActivity.this, BuildConfig.APPKEY , blipOptions);
                 } catch (IllegalArgumentException e) {
@@ -166,9 +166,9 @@ public class SandboxAppActivity extends AppCompatActivity {
             try {
                 BlipOptions blipOptions = new BlipOptions();
                 blipOptions.setAuthConfig(new AuthConfig(AuthType.Guest));
-                blipOptions.setCustomCommonUrl("https://compliance-take.chat.blip.ai/");
+                blipOptions.setCustomCommonUrl("https://compliance-c5a30.chat.blip.ai/");
                 
-                currentChatFragment = BlipClient.openEmbeddedThread("c2FsbGVzaHR0cDo0NzhhMWU2NC1lMjM4LTRhMGEtYTdkNi02MWFkZDZhNGQyMTE=", blipOptions);
+                currentChatFragment = BlipClient.openEmbeddedThread("ZmFtb3NvdGFrZTpkNzg4MWVjZS0zYWIzLTQ4NTUtOTAwYi1hZTdmZmQxMWI1ZTc=", blipOptions);
                 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, currentChatFragment, "chat_fragment");

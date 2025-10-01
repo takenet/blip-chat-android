@@ -28,7 +28,7 @@ allprojects {
 
 Add the dependency:
 ```groovy
-implementation 'io.github.takenet:blipchat:3.0.00.9'
+implementation 'io.github.takenet:blipchat:3.0.01.2'
 ```
 
 How to use
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 It is also necessary to add gson dependency to your app once BLiP Chat uses this library.
 
 ```groovy
-implementation 'com.google.code.gson:gson:2.8.5'
+implementation 'com.google.code.gson:gson:2.8.9'
 ```
 
 ### Setting your SDK

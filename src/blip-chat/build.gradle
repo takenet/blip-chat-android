@@ -17,12 +17,12 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled false
             buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://unpkg.com/blip-chat-widget"'
             buildConfigField 'String', 'BLIP_CHAT_URL', '"https://chat.blip.ai/"'
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug{
+            minifyEnabled false
             buildConfigField 'String', 'SCRIPT_SDK_URL', '"https://unpkg.com/blip-chat-widget"'
             buildConfigField 'String', 'BLIP_CHAT_URL', '"https://chat.blip.ai/"'
         }
@@ -71,7 +71,7 @@ artifacts {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.takenet'
-    PUBLISH_VERSION = '3.0.00.9'
+    PUBLISH_VERSION = '3.0.01.2'
     PUBLISH_ARTIFACT_ID = 'blipchat'
     PUBLISH_DESCRIPTION = 'BlipChat Android SDK'
     PUBLISH_URL = 'https://github.com/takenet/blip-chat-android'
@@ -197,7 +197,7 @@ task generateChecksums {
         
         // Find all files in the directory
         fileTree(artifactPath).each { file ->
-            if (file.isFile() && !file.name.endsWith('.md5') && !file.name.endsWith('.sha1')) {
+            if (file.isFile() && !file.name.endsWith('.md5') && !file.name.endsWith('.sha1') && !file.name.endsWith('.sha256') && !file.name.endsWith('.sha512')) {
                 def fileName = file.name
                 
                 // Generate MD5
@@ -216,6 +216,22 @@ task generateChecksums {
                 def sha1Hash = sha1.digest().collect { String.format("%02x", it) }.join()
                 new File(file.parent, "${fileName}.sha1").text = sha1Hash
                 
+                // Generate SHA256
+                def sha256 = java.security.MessageDigest.getInstance("SHA-256")
+                file.eachByte(4096) { bytes, size ->
+                    sha256.update(bytes, 0, size)
+                }
+                def sha256Hash = sha256.digest().collect { String.format("%02x", it) }.join()
+                new File(file.parent, "${fileName}.sha256").text = sha256Hash
+                
+                // Generate SHA512
+                def sha512 = java.security.MessageDigest.getInstance("SHA-512")
+                file.eachByte(4096) { bytes, size ->
+                    sha512.update(bytes, 0, size)
+                }
+                def sha512Hash = sha512.digest().collect { String.format("%02x", it) }.join()
+                new File(file.parent, "${fileName}.sha512").text = sha512Hash
+                
                 println "Checksums generated for: ${fileName}"
             }
         }
@@ -225,22 +241,76 @@ task generateChecksums {
 // Task to generate bundle for the new Sonatype Central
 task generateBundle(type: Zip) {
     dependsOn 'generateChecksums'
+    dependsOn 'signReleasePublication'
     
     def localRepo = "${System.getProperty('user.home')}/.m2/repository"
     def groupPath = PUBLISH_GROUP_ID.replace('.', '/')
     def artifactPath = "${localRepo}/${groupPath}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
     
-    // Include files with correct directory structure
+    // Include all files including GPG signatures with proper Maven structure
     from(artifactPath) {
-        into "${groupPath}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
-        include '**/*'
+        include '*.pom'
+        include '*.pom.asc'
+        include '*.pom.md5' 
+        include '*.pom.sha1'
+        include '*.pom.sha256'
+        include '*.pom.sha512'
+        include '*.pom.asc.md5'
+        include '*.pom.asc.sha1'
+        include '*.pom.asc.sha256'
+        include '*.pom.asc.sha512'
+        include '*.aar'
+        include '*.aar.asc'
+        include '*.aar.md5'
+        include '*.aar.sha1'
+        include '*.aar.sha256'
+        include '*.aar.sha512'
+        include '*.aar.asc.md5'
+        include '*.aar.asc.sha1'
+        include '*.aar.asc.sha256'
+        include '*.aar.asc.sha512'
+        include '*-sources.jar'
+        include '*-sources.jar.asc'
+        include '*-sources.jar.md5'
+        include '*-sources.jar.sha1'
+        include '*-sources.jar.sha256'
+        include '*-sources.jar.sha512'
+        include '*-sources.jar.asc.md5'
+        include '*-sources.jar.asc.sha1'
+        include '*-sources.jar.asc.sha256'
+        include '*-sources.jar.asc.sha512'
+        
+        // Set proper Maven Central directory structure
+        into "${PUBLISH_GROUP_ID.replace('.', '/')}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}"
     }
+    
+    includeEmptyDirs = false
     
     archiveFileName = "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-bundle.zip"
     destinationDirectory = file("${buildDir}/distributions")
     
+    doFirst {
+        // Verify all required files exist
+        def requiredFiles = [
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}.pom",
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}.pom.asc",
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}.aar",
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}.aar.asc",
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-sources.jar",
+            "${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-sources.jar.asc"
+        ]
+        
+        requiredFiles.each { fileName ->
+            def file = new File(artifactPath, fileName)
+            if (!file.exists()) {
+                throw new Exception("Required file missing: ${file.absolutePath}")
+            }
+        }
+    }
+    
     doLast {
         println "Bundle generated at: ${destinationDirectory}/${archiveFileName.get()}"
+        println "Bundle size: ${new File(destinationDirectory.get().asFile, archiveFileName.get()).length()} bytes"
         println "Manual upload at: https://central.sonatype.com/publishing"
     }
 }
@@ -253,11 +323,34 @@ task uploadToCentral {
         def bundlePath = "${buildDir}/distributions/${PUBLISH_ARTIFACT_ID}-${PUBLISH_VERSION}-bundle.zip"
         def uploadUrl = "https://central.sonatype.com/api/v1/publisher/upload"
         
-        exec {
-            commandLine 'curl', '-X', 'POST',
-                '-H', "Authorization: Bearer ${osshBearerToken}",
-                '-F', "bundle=@${bundlePath}",
-                uploadUrl
+        // Verify bundle exists
+        def bundleFile = new File(bundlePath)
+        if (!bundleFile.exists()) {
+            throw new Exception("Bundle file not found: ${bundlePath}")
+        }
+        
+        // Verify token exists
+        if (!osshBearerToken || osshBearerToken.trim().isEmpty()) {
+            throw new Exception("Bearer token (osshBearerToken) is required for upload")
+        }
+        
+        println "Uploading bundle: ${bundleFile.name} (${bundleFile.length()} bytes)"
+        println "Upload URL: ${uploadUrl}"
+        
+        try {
+            exec {
+                commandLine 'curl', '-v', '-X', 'POST',
+                    '-H', "Authorization: Bearer ${osshBearerToken}",
+                    '-H', 'Content-Type: multipart/form-data',
+                    '-F', "bundle=@${bundlePath}",
+                    '--fail-with-body',
+                    uploadUrl
+            }
+            println "Upload completed successfully!"
+        } catch (Exception e) {
+            println "Upload failed: ${e.message}"
+            println "Check your bearer token and bundle content"
+            throw e
         }
     }
 }
