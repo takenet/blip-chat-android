@@ -20,6 +20,19 @@
    public *;
 }
 
+# Keep all BlipChat classes to avoid issues with published version
+-keep class net.take.blipchat.** { *; }
+-keepclassmembers class net.take.blipchat.** { *; }
+
+# GSON specific rules
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
 -dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry
 
 -keepclassmembers class net.take.blipchat.models.** {
