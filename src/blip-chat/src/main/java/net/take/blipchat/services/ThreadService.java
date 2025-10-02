@@ -3,7 +3,6 @@ package net.take.blipchat.services;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class ThreadService {
-    
     private static final Gson jsonConverter = new Gson();
     
     private static CustomWebChromeClient lastCustomWebChromeClient;
@@ -38,70 +36,7 @@ public class ThreadService {
     private static String lastPageContent;
     private static String lastBaseUrl;
     
-    public static WebView createChatWebView(Context context, String appKey, BlipOptions blipOptions) {
-        return createChatWebView(context, appKey, blipOptions, null);
-    }
-    
-    public static WebView createChatWebView(Context context, String appKey, BlipOptions blipOptions, ThreadActivityListener listener) {
-        WebView webView = new WebView(context);
-        
-        String baseUrl = "https://" + context.getPackageName();
-        
-        ThreadActivityListener actualListener = listener;
 
-        if (actualListener == null) {
-            actualListener = new ThreadActivityListener() {
-                @Override
-                public void setProgressBarValue(int progress) {
-                    // No-op for Fragment usage
-                }
-                
-                @Override
-                public void enableProgressView(boolean mustEnable) {
-                    // No-op for Fragment usage
-                }
-            };
-        }
-        
-        ThreadActivity threadActivity = (context instanceof ThreadActivity) ? (ThreadActivity) context : null;
-        WebAppInterface webAppInterface = new WebAppInterface(threadActivity);
-        
-        BlipWebViewBuilder webViewBuilder = new BlipWebViewBuilder(context, webView);
-        CustomWebChromeClient customWebChromeClient = new CustomWebChromeClient(threadActivity, actualListener);
-        CustomWebViewClient customWebViewClient = new CustomWebViewClient(actualListener, baseUrl, context);
-        
-
-        lastCustomWebChromeClient = customWebChromeClient;
-        lastCustomWebViewClient = customWebViewClient;
-        lastBaseUrl = baseUrl;
-        
-        try {
-            webViewBuilder
-                    .withCustomWebViewClient(customWebViewClient)
-                    .withCustomWebChromeClient(customWebChromeClient)
-                    .withJavaScriptSupport()
-                    .withJavascriptInterface(webAppInterface)
-                    .withCustomDownloader()
-                    .withGeolocation()
-                    .withZoomSupport()
-                    .withCacheEnabled(true);
-        } catch (Exception e) {
-            Log.e(ThreadService.class.getCanonicalName(), e.getMessage());
-            return null;
-        }
-        
-        webView = webViewBuilder.build();
-        
-        if (context instanceof Activity) {
-            setKeyboardVisibilityListener((Activity) context, webAppInterface);
-        }
-        
-        String pageContent = generateHtmlPageContent(context, appKey, blipOptions);
-        lastPageContent = pageContent;
-        webView.loadDataWithBaseURL(baseUrl, pageContent, "text/html; charset=UTF-8", null, null);
-        
-        return webView;
-    }
     
     public static CustomWebChromeClient getLastCustomWebChromeClient() {
         return lastCustomWebChromeClient;
@@ -120,7 +55,6 @@ public class ThreadService {
     }
     
     public static void setupChatView(View rootView, String appKey, BlipOptions blipOptions, ThreadActivityListener listener) {
-        FrameLayout progressContainer = rootView.findViewById(R.id.progressContainer);
         ProgressBar progressBar = rootView.findViewById(R.id.progressBar);
         WebView webView = rootView.findViewById(R.id.webview);
         

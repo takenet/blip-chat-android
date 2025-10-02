@@ -93,7 +93,7 @@ ext["signing.password"] = ''
 ext["signing.secretKeyRingFile"] = ''
 ext["ossrhUsername"] = ''
 ext["ossrhPassword"] = ''
-ext["osshBearerToken"] = ''
+ext["ossrhBearerToken"] = ''
 
 File secretPropsFile = project.rootProject.file('local.properties')
 if (secretPropsFile.exists()) {
@@ -110,7 +110,7 @@ if (secretPropsFile.exists()) {
     ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE')
     ext["ossrhUsername"] = System.getenv('OSSRH_USERNAME')
     ext["ossrhPassword"] = System.getenv('OSSRH_PASSWORD')
-    ext["osshBearerToken"] = System.getenv('OSSH_BEARER_TOKEN')
+    ext["ossrhBearerToken"] = System.getenv('OSSH_BEARER_TOKEN')
 }
 
 publishing {
@@ -330,8 +330,8 @@ task uploadToCentral {
         }
         
         // Verify token exists
-        if (!osshBearerToken || osshBearerToken.trim().isEmpty()) {
-            throw new Exception("Bearer token (osshBearerToken) is required for upload")
+        if (!ossrhBearerToken || ossrhBearerToken.trim().isEmpty()) {
+            throw new Exception("Bearer token (ossrhBearerToken) is required for upload")
         }
         
         println "Uploading bundle: ${bundleFile.name} (${bundleFile.length()} bytes)"
@@ -340,7 +340,7 @@ task uploadToCentral {
         try {
             exec {
                 commandLine 'curl', '-v', '-X', 'POST',
-                    '-H', "Authorization: Bearer ${osshBearerToken}",
+                    '-H', "Authorization: Bearer ${ossrhBearerToken}",
                     '-H', 'Content-Type: multipart/form-data',
                     '-F', "bundle=@${bundlePath}",
                     '--fail-with-body',
