@@ -111,7 +111,7 @@ public class ThreadService {
         webView = webViewBuilder.build();
         
         if (context instanceof Activity) {
-            setKeyboardVisibilityListener((Activity) context, webAppInterface);
+            setKeyboardVisibilityListener((Activity) context, webAppInterface, webView);
         }
         
         String pageContent = generateHtmlPageContent(context, appKey, blipOptions);
@@ -162,21 +162,25 @@ public class ThreadService {
         return content.toString();
     }
     
-    private static void setKeyboardVisibilityListener(Activity activity, WebAppInterface webAppInterface) {
+    private static void setKeyboardVisibilityListener(Activity activity, WebAppInterface webAppInterface, final WebView webView) {
         final View activityRootView = activity.findViewById(android.R.id.content);
         if (activityRootView != null) {
+            final boolean[] lastEmittedKeyboardState = {false};
             activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+                    boolean isOpen = heightDiff > Helpers.dpToPx(activity, 200);
 
-                    if (heightDiff > Helpers.dpToPx(activity, 200)) { // keyboard opened
-                        if (webAppInterface != null) {
-                            webAppInterface.setIsKeyboardOpen(true);
-                        }
-                    } else { // keyboard closed
-                        if (webAppInterface != null) {
-                            webAppInterface.setIsKeyboardOpen(false);
+                    if (webAppInterface != null) {
+                        webAppInterface.setIsKeyboardOpen(isOpen);
+                    }
+
+                    // Only notify JS when the keyboard state actually changes, to avoid redundant calls on every layout pass
+                    if (isOpen != lastEmittedKeyboardState[0]) {
+                        lastEmittedKeyboardState[0] = isOpen;
+                        if (webView != null) {
+                            webView.evaluateJavascript("window.postMessage({code:'KeyboardState', isOpen:" + isOpen + "}, '*')", null);
                         }
                     }
                 }
