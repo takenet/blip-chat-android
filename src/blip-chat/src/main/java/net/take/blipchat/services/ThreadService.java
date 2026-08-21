@@ -1,6 +1,7 @@
 package net.take.blipchat.services;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
@@ -180,7 +181,12 @@ public class ThreadService {
                     if (isOpen != lastEmittedKeyboardState[0]) {
                         lastEmittedKeyboardState[0] = isOpen;
                         if (webView != null) {
-                            webView.evaluateJavascript("window.postMessage({code:'KeyboardState', isOpen:" + isOpen + "}, '*')", null);
+                            String script = "window.postMessage({code:'KeyboardState', isOpen:" + isOpen + "}, '*')";
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                webView.evaluateJavascript(script, null);
+                            } else {
+                                webView.loadUrl("javascript:" + script);
+                            }
                         }
                     }
                 }
