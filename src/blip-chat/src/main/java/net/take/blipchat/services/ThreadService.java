@@ -181,7 +181,7 @@ public class ThreadService {
                     if (isOpen != lastEmittedKeyboardState[0]) {
                         lastEmittedKeyboardState[0] = isOpen;
                         if (webView != null) {
-                            String script = "window.postMessage({code:'KeyboardState', isOpen:" + isOpen + "}, '*')";
+                            String script = "setKeyboardOpen(" + isOpen + ")";
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                 webView.evaluateJavascript(script, null);
                             } else {

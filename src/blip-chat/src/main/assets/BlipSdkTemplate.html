@@ -33,6 +33,13 @@
                 blipChatIframe.contentWindow.postMessage({ code: setPresenceCode }, "%blipChatUrl%");
             }
         }
+
+        function setKeyboardOpen(isOpen) {
+            var blipChatIframe = document.getElementById('blip-chat-iframe');
+            if (blipChatIframe && blipChatIframe.contentWindow) {
+                blipChatIframe.contentWindow.postMessage({ code: 'KeyboardState', isOpen: isOpen }, "%blipChatUrl%");
+            }
+        }
 </script>
 </body>
 
