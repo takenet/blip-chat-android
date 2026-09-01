@@ -24,16 +24,30 @@ O pacote Java permanece `net.take.blipchat` (não migrado — mudar o pacote que
 
 ## Emissão proativa de estado de teclado via `postMessage` (Energisa F7)
 
-Commit `109a9b1 feat(webview): emit keyboard visibility state proactively to JS via postMessage`, seguido de `257a82a fix(webview): guard evaluateJavascript call with API level check for minSdkVersion 15 compatibility` (mesma branch, `feat/blip-chat-evolution-energisa`). Corrige item F7 do discovery Energisa (teclado virtual cobrindo o campo de input).
+Commit `109a9b1 feat(webview): emit keyboard visibility state proactively to JS via postMessage`, seguido de `257a82a fix(webview): guard evaluateJavascript call with API level check for minSdkVersion 15 compatibility` (mesma branch, `feat/blip-chat-evolution-energisa`). Tentativa de corrigir o item F7 do discovery Energisa (teclado virtual cobrindo o campo de input).
+
+**Blocker real encontrado em auditoria final e corrigido por `1744011 fix(webview): relay keyboard state postMessage into the chat iframe instead of the main frame`** — ver subseção "Correção do blocker" abaixo. Não tratar `109a9b1`/`257a82a` isoladamente como "F7 corrigido"; a versão funcional é a pós-`1744011`.
 
 Mecanismo, em `ThreadService.setKeyboardVisibilityListener` (agora recebe também a referência de `WebView`, além de `Activity`/`WebAppInterface`):
 
 - O `OnGlobalLayoutListener` já existente (compara `activityRootView.getRootView().getHeight()` com `activityRootView.getHeight()`, threshold de `200dp` via `Helpers.dpToPx`) continua atualizando `webAppInterface.setIsKeyboardOpen(isOpen)` a cada layout pass, como antes — isso é o polling que o JS já podia consultar sob demanda (`window.Android.isKeyboardOpen()`).
-- **Novidade:** o listener agora também emite proativamente `window.postMessage({code:'KeyboardState', isOpen}, '*')` para o JS via `webView.evaluateJavascript(...)`, para que o JS não precise mais fazer polling.
+- **Novidade:** o listener agora também emite proativamente um `postMessage` com `code: 'KeyboardState'`/`isOpen` para o JS via `webView.evaluateJavascript(...)`, para que o JS não precise mais fazer polling.
 - **Deduplicação:** um array de 1 posição (`final boolean[] lastEmittedKeyboardState = {false}`, truque padrão para capturar variável mutável em classe anônima) guarda o último estado emitido; o `postMessage` só dispara quando `isOpen` difere do último valor emitido — evita chamadas redundantes a cada layout pass (o `onGlobalLayout` dispara com muito mais frequência do que a real mudança de estado do teclado).
 - **Guarda de compatibilidade (`257a82a`):** `WebView.evaluateJavascript(...)` só existe a partir de API 19 (`KITKAT`). Como o `minSdkVersion` do módulo é 15, a chamada é guardada por `Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT`; abaixo disso, cai para `webView.loadUrl("javascript:" + script)` (mecanismo mais antigo e sem retorno de valor, mas funcional para disparar o `postMessage`).
 
 Local exato: `ThreadService.java`, método `setKeyboardVisibilityListener` (chamado a partir de `configureWebView`, apenas quando `context instanceof Activity` — ou seja, hoje só é ativado no fluxo que passa uma `Activity`; ver gap relacionado de E1 abaixo sobre `context instanceof ThreadActivity` vs `Activity` genérica).
+
+### Correção do blocker: `postMessage` no frame principal nunca alcançava o iframe do widget (`1744011`)
+
+**BLOCKER real, encontrado em auditoria final de completude e corrigido/revisado nesta sessão.** A versão `109a9b1`/`257a82a` emitia `window.postMessage({code:'KeyboardState', isOpen}, '*')` via `webView.evaluateJavascript(...)` — isso executa no **frame principal** carregado pelo `WebView` (o próprio `BlipSdkTemplate.html`), não dentro do `<iframe id="blip-chat-iframe">` que esse template embute e onde o widget web real (`blip-chat-widget` → `App.vue` do `blip-chat`) roda e escuta `message` events. Resultado: a mensagem nunca chegava ao destino — o `postMessage` "no vazio", F7 continuava quebrado apesar do código parecer correto.
+
+Correção (`1744011 fix(webview): relay keyboard state postMessage into the chat iframe instead of the main frame`):
+
+- Nova função `setKeyboardOpen(isOpen)` em `BlipSdkTemplate.html`, no mesmo padrão já usado por `setPresence` (código pré-existente que já fazia esse relay corretamente para outro propósito): busca `document.getElementById('blip-chat-iframe')` e chama `blipChatIframe.contentWindow.postMessage({code: 'KeyboardState', isOpen: isOpen}, "%blipChatUrl%")` — com `targetOrigin` real (placeholder `%blipChatUrl%` preenchido no build do template), não `'*'`.
+- `ThreadService.java` deixou de montar o `postMessage` diretamente; agora o script injetado via `evaluateJavascript`/`loadUrl` é só `"setKeyboardOpen(" + isOpen + ")"`, delegando o relay para dentro do iframe à função do template.
+- Revisado por um Reviewer independente nesta sessão: `BLOCKER RESOLVIDO`/`APPROVED`, incluindo confirmação de que o contrato (`code: 'KeyboardState'`, campo `isOpen`) é exatamente o que o listener em `blip-chat/App.vue` espera do lado do widget web.
+
+**Conhecimento permanente (aplica-se a qualquer comunicação nativo→JS futura neste SDK):** `WebView.evaluateJavascript(...)` (e `loadUrl("javascript:...")`) executa **apenas no frame principal** carregado pelo `WebView` — nunca propaga automaticamente para dentro de um `<iframe>` filho. `BlipSdkTemplate.html` carrega o widget real (`blip-chat-widget`) dentro de um iframe (`blip-chat-iframe`), então qualquer mensagem que precise chegar ao **conteúdo do iframe** (e não ao template SDK em si) exige uma função de relay explícita no template — buscar o iframe por `getElementById` e chamar `contentWindow.postMessage(...)` com `targetOrigin` real — como `setPresence`/`setKeyboardOpen` já fazem. Nunca assumir que `window.postMessage` disparado no frame principal alcança o iframe.
 
 ## Débito técnico conhecido: captura de foto nativa (E1) quebra em modo Embedded com NPE
 

@@ -29,6 +29,14 @@ Risco estrutural conhecido: esse estado estático é compartilhado entre instân
 
 Débito técnico relacionado (não corrigido): o upload de arquivo via `onShowFileChooser`/`CustomWebChromeClient` funciona apenas quando `context instanceof ThreadActivity` — em `BlipChatFragment` (modo Embedded) a referência de Activity passada a `CustomWebChromeClient` fica `null` e o fluxo lança `NullPointerException`. Detalhe completo, causa raiz e arquivos exatos em [decisions.md](./decisions.md#débito-técnico-conhecido-captura-de-foto-nativa-e1-quebra-em-modo-embedded-com-npe).
 
+## Fato-chave: `evaluateJavascript`/`loadUrl("javascript:...")` só alcança o frame principal, não o `<iframe>` do widget
+
+`BlipSdkTemplate.html` (o documento carregado diretamente pelo `WebView` via `loadDataWithBaseURL`) embute o widget web real (`blip-chat-widget`, que roda `App.vue` do `blip-chat`) dentro de um `<iframe id="blip-chat-iframe">`. Nativo→JS via `webView.evaluateJavascript(...)` ou `webView.loadUrl("javascript:...")` executa **apenas no frame principal** (o próprio template) — nunca propaga automaticamente para dentro do iframe filho, mesmo same-origin.
+
+Qualquer comunicação que precise chegar ao conteúdo do iframe (não ao template SDK) precisa de uma função de relay explícita definida em `BlipSdkTemplate.html`, que localiza o iframe via `getElementById('blip-chat-iframe')` e chama `contentWindow.postMessage(...)` com `targetOrigin` real (placeholder `%blipChatUrl%`, nunca `'*'`). Padrão já usado por `setPresence` e, após correção de um blocker real (ver [decisions.md](./decisions.md#correção-do-blocker-postmessage-no-frame-principal-nunca-alcançava-o-iframe-do-widget-1744011)), também por `setKeyboardOpen`. Uma tentativa anterior de emitir `postMessage` diretamente do lado nativo direto no frame principal (sem essa função de relay) parecia funcionar no código mas a mensagem nunca chegava ao destino — não assumir que isso funciona sem o relay explícito.
+
+
+
 ## Modelos (`models/`, todos `Serializable`, seriados via Gson e passados por `Bundle`/`Intent` como JSON string)
 
 - `BlipOptions` — agrega `AuthConfig`, `Account`, `ConnectionDataConfig`, `customCommonUrl`, `customWidgetUrl`. `hideMenu` está `@Deprecated` e o setter é no-op (mantido só por compatibilidade binária).

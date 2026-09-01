@@ -12,7 +12,7 @@
 | [testing.md](./testing.md)           | O que existe de testes (unitário/instrumentado) e o que não existe.                           |
 | [integrations.md](./integrations.md) | Firebase (app de exemplo), Maven Central, BLiP Chat Web Widget (via WebView).                 |
 | [decisions.md](./decisions.md)       | Decisões e reversões técnicas relevantes (versão do AGP, modos de integração, versionamento). |
-| [roadmap.md](./roadmap.md)           | Itens do discovery Energisa relevantes a este SDK (F7 corrigido, E1 pendente de decisão).     |
+| [roadmap.md](./roadmap.md)           | Itens do discovery Energisa relevantes a este SDK (F7 corrigido após correção de blocker de relay para o iframe, E1 pendente de decisão). |
 
 ## Escopo
 
