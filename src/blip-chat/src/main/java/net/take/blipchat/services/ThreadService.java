@@ -1,6 +1,7 @@
 package net.take.blipchat.services;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.WebView;
@@ -14,7 +15,6 @@ import android.view.ViewTreeObserver;
 
 import net.take.blipchat.BuildConfig;
 import net.take.blipchat.R;
-import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.listeners.ThreadActivityListener;
 import net.take.blipchat.models.BlipOptions;
 import net.take.blipchat.utils.Constants;
@@ -25,9 +25,13 @@ import net.take.blipchat.webview.CustomWebViewClient;
 import net.take.blipchat.webview.WebAppInterface;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import android.net.Uri;
+import android.webkit.ValueCallback;
 
 public class ThreadService {
     private static final Gson jsonConverter = new Gson();
@@ -83,11 +87,11 @@ public class ThreadService {
             };
         }
         
-        ThreadActivity threadActivity = (context instanceof ThreadActivity) ? (ThreadActivity) context : null;
-        WebAppInterface webAppInterface = new WebAppInterface(threadActivity);
+        Activity activity = (context instanceof Activity) ? (Activity) context : null;
+        WebAppInterface webAppInterface = new WebAppInterface(context);
         
         BlipWebViewBuilder webViewBuilder = new BlipWebViewBuilder(context, webView);
-        CustomWebChromeClient customWebChromeClient = new CustomWebChromeClient(threadActivity, actualListener);
+        CustomWebChromeClient customWebChromeClient = new CustomWebChromeClient(activity, actualListener);
         CustomWebViewClient customWebViewClient = new CustomWebViewClient(actualListener, baseUrl, context);
         
         lastCustomWebChromeClient = customWebChromeClient;
@@ -163,6 +167,33 @@ public class ThreadService {
         return content.toString();
     }
     
+    public static void handleActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (lastCustomWebChromeClient == null || requestCode != CustomWebChromeClient.FCR) {
+            return;
+        }
+
+        ValueCallback<Uri[]> pathCallback = lastCustomWebChromeClient.getPathCallback();
+        if (pathCallback == null) {
+            return;
+        }
+
+        Uri[] results = null;
+        if (resultCode == Activity.RESULT_OK) {
+            if (intent == null || intent.getData() == null) {
+                String filePath = lastCustomWebChromeClient.getFilePath();
+                if (filePath != null) {
+                    results = new Uri[]{Uri.fromFile(new File(filePath))};
+                }
+            } else {
+                String dataString = intent.getDataString();
+                if (dataString != null) {
+                    results = new Uri[]{Uri.parse(dataString)};
+                }
+            }
+        }
+        pathCallback.onReceiveValue(results);
+    }
+
     private static void setKeyboardVisibilityListener(Activity activity, WebAppInterface webAppInterface, final WebView webView) {
         final View activityRootView = activity.findViewById(android.R.id.content);
         if (activityRootView != null) {

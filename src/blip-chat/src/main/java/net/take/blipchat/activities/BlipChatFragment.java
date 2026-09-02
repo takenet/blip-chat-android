@@ -1,5 +1,6 @@
 package net.take.blipchat;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -87,6 +88,12 @@ public class BlipChatFragment extends Fragment implements ThreadActivityListener
         }
     }
     
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        ThreadService.handleActivityResult(requestCode, resultCode, intent);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

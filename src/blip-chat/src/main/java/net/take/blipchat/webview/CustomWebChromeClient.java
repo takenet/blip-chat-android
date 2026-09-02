@@ -2,6 +2,7 @@ package net.take.blipchat.webview;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -20,7 +21,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import net.take.blipchat.R;
-import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.listeners.ExternalFilePermissionListener;
 import net.take.blipchat.listeners.GeolocationPermissionListener;
 import net.take.blipchat.listeners.ThreadActivityListener;
@@ -36,13 +36,13 @@ import static net.take.blipchat.activities.ThreadActivity.WRITE_EXTERNAL_STORAGE
 //WebViewChrome let you know when progress change to set the value for the progress bar
 public class CustomWebChromeClient extends WebChromeClient implements GeolocationPermissionListener, ExternalFilePermissionListener {
 
-    private ThreadActivity activity;
+    private Activity activity;
     private final ThreadActivityListener listener;
     private GeolocationPermissions.Callback permissionCallback;
     private String permissionOrigin;
     private ValueCallback<Uri[]> pathCallback;
     private String filePath;
-    private final static int FCR=1;
+    public final static int FCR=1;
 
 
     public ValueCallback<Uri[]> getPathCallback() {
@@ -53,7 +53,7 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
         return filePath;
     }
 
-    public CustomWebChromeClient(ThreadActivity activity, ThreadActivityListener listener) {
+    public CustomWebChromeClient(Activity activity, ThreadActivityListener listener) {
         this.activity = activity;
         this.listener = listener;
     }
