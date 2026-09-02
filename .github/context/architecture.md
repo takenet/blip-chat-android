@@ -35,8 +35,6 @@ Débito técnico relacionado (não corrigido): o upload de arquivo via `onShowFi
 
 Qualquer comunicação que precise chegar ao conteúdo do iframe (não ao template SDK) precisa de uma função de relay explícita definida em `BlipSdkTemplate.html`, que localiza o iframe via `getElementById('blip-chat-iframe')` e chama `contentWindow.postMessage(...)` com `targetOrigin` real (placeholder `%blipChatUrl%`, nunca `'*'`). Padrão já usado por `setPresence` e, após correção de um blocker real (ver [decisions.md](./decisions.md#correção-do-blocker-postmessage-no-frame-principal-nunca-alcançava-o-iframe-do-widget-1744011)), também por `setKeyboardOpen`. Uma tentativa anterior de emitir `postMessage` diretamente do lado nativo direto no frame principal (sem essa função de relay) parecia funcionar no código mas a mensagem nunca chegava ao destino — não assumir que isso funciona sem o relay explícito.
 
-
-
 ## Modelos (`models/`, todos `Serializable`, seriados via Gson e passados por `Bundle`/`Intent` como JSON string)
 
 - `BlipOptions` — agrega `AuthConfig`, `Account`, `ConnectionDataConfig`, `customCommonUrl`, `customWidgetUrl`. `hideMenu` está `@Deprecated` e o setter é no-op (mantido só por compatibilidade binária).
