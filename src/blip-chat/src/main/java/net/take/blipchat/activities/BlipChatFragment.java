@@ -55,7 +55,7 @@ public class BlipChatFragment extends Fragment implements ThreadActivityListener
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_thread, container, false);
         
-        ThreadService.setupChatView(view, appKey, blipOptions, this);
+        ThreadService.setupChatView(view, appKey, blipOptions, this, this);
         
         progressContainer = view.findViewById(R.id.progressContainer);
         progressBar = view.findViewById(R.id.progressBar);
@@ -92,6 +92,12 @@ public class BlipChatFragment extends Fragment implements ThreadActivityListener
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         ThreadService.handleActivityResult(requestCode, resultCode, intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        ThreadService.handlePermissionsResult(requestCode, grantResults);
     }
 
     @Override

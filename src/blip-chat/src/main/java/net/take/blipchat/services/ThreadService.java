@@ -2,7 +2,9 @@ package net.take.blipchat.services;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
@@ -33,6 +35,9 @@ import java.io.InputStreamReader;
 import android.net.Uri;
 import android.webkit.ValueCallback;
 
+import static net.take.blipchat.activities.ThreadActivity.PERMISSIONS_REQUEST_FINE_LOCATION;
+import static net.take.blipchat.activities.ThreadActivity.WRITE_EXTERNAL_STORAGE;
+
 public class ThreadService {
     private static final Gson jsonConverter = new Gson();
     
@@ -60,16 +65,20 @@ public class ThreadService {
     }
     
     public static void setupChatView(View rootView, String appKey, BlipOptions blipOptions, ThreadActivityListener listener) {
+        setupChatView(rootView, appKey, blipOptions, listener, null);
+    }
+    
+    public static void setupChatView(View rootView, String appKey, BlipOptions blipOptions, ThreadActivityListener listener, Fragment fragment) {
         ProgressBar progressBar = rootView.findViewById(R.id.progressBar);
         WebView webView = rootView.findViewById(R.id.webview);
         
         progressBar.setMax(100);
         progressBar.setProgress(0);
         
-        configureWebView(webView, rootView.getContext(), appKey, blipOptions, listener);
+        configureWebView(webView, rootView.getContext(), appKey, blipOptions, listener, fragment);
     }
     
-    private static void configureWebView(WebView webView, Context context, String appKey, BlipOptions blipOptions, ThreadActivityListener listener) {
+    private static void configureWebView(WebView webView, Context context, String appKey, BlipOptions blipOptions, ThreadActivityListener listener, Fragment fragment) {
         String baseUrl = "https://" + context.getPackageName();
         
         ThreadActivityListener actualListener = listener;
@@ -91,7 +100,7 @@ public class ThreadService {
         WebAppInterface webAppInterface = new WebAppInterface(context);
         
         BlipWebViewBuilder webViewBuilder = new BlipWebViewBuilder(context, webView);
-        CustomWebChromeClient customWebChromeClient = new CustomWebChromeClient(activity, actualListener);
+        CustomWebChromeClient customWebChromeClient = new CustomWebChromeClient(activity, fragment, actualListener);
         CustomWebViewClient customWebViewClient = new CustomWebViewClient(actualListener, baseUrl, context);
         
         lastCustomWebChromeClient = customWebChromeClient;
@@ -192,6 +201,32 @@ public class ThreadService {
             }
         }
         pathCallback.onReceiveValue(results);
+    }
+
+    // Embedded-mode counterpart of ThreadActivity#onRequestPermissionsResult.
+    // Deliberately does not show the "permission denied permanently" settings dialog.
+    public static void handlePermissionsResult(int requestCode, int[] grantResults) {
+        if (lastCustomWebChromeClient == null) {
+            return;
+        }
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_FINE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    lastCustomWebChromeClient.grantGeoLocationPermission();
+                } else {
+                    lastCustomWebChromeClient.rejectGeoLocationPermission();
+                }
+                break;
+            case WRITE_EXTERNAL_STORAGE:
+                for (int grantResult : grantResults) {
+                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                        lastCustomWebChromeClient.rejectExternalFilePermission();
+                        return;
+                    }
+                }
+                lastCustomWebChromeClient.grantExternalFilePermission();
+                break;
+        }
     }
 
     private static void setKeyboardVisibilityListener(Activity activity, WebAppInterface webAppInterface, final WebView webView) {
