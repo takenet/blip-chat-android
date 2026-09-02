@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
 - ✅ Perfect for chat-centric apps
 - ✅ Show/hide chat without navigation
 
+> **Requirement for Embedded Mode:** the hosting Activity **must** extend `FragmentActivity`/`AppCompatActivity` (required by `getSupportFragmentManager()` used to attach `BlipChatFragment`) and, if it overrides `onActivityResult`/`onRequestPermissionsResult`, it **must** call `super.onActivityResult(...)`/`super.onRequestPermissionsResult(...)` first. File attachment, native camera capture and location permission requests inside the embedded chat are routed through the Fragment and depend on this propagation to work.
+
 ## 🔧 Advanced Configuration
 
 ### Prerequisites
