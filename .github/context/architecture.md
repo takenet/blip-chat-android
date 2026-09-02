@@ -27,7 +27,7 @@ BlipClient (fachada estática, API pública)
 
 Risco estrutural conhecido: esse estado estático é compartilhado entre instâncias — se Activity e Fragment forem abertos simultaneamente (ou múltiplos Fragments), o último `setupChatView` sobrescreve o estado usado pelos outros. Não há isolamento por instância.
 
-Débito técnico relacionado (não corrigido): o upload de arquivo via `onShowFileChooser`/`CustomWebChromeClient` funciona apenas quando `context instanceof ThreadActivity` — em `BlipChatFragment` (modo Embedded) a referência de Activity passada a `CustomWebChromeClient` fica `null` e o fluxo lança `NullPointerException`. Detalhe completo, causa raiz e arquivos exatos em [decisions.md](./decisions.md#débito-técnico-conhecido-captura-de-foto-nativa-e1-quebra-em-modo-embedded-com-npe).
+**Corrigido** (era débito técnico, E1): o upload de arquivo via `onShowFileChooser`/`CustomWebChromeClient` funcionava apenas quando `context instanceof ThreadActivity`, lançando `NullPointerException` em modo Embedded. Corrigido em 3 commits (`a152165`, `b8eafce`, `38393c8`) propagando uma `Activity` genérica e, depois, um `Fragment` opcional por toda a cadeia (`CustomWebChromeClient` → `ThreadService.setupChatView`/`configureWebView` → `BlipChatFragment`), com `BlipChatFragment.onActivityResult`/`onRequestPermissionsResult` novos delegando a `ThreadService`. Histórico completo, causa raiz original e riscos residuais aceitos (estado estático compartilhado; diálogo de permissão negada permanentemente ausente em Embedded) em [decisions.md](./decisions.md#e1-captura-de-foto-nativa-corrigido-em-ambos-os-modos-full-screen-e-embedded).
 
 ## Fato-chave: `evaluateJavascript`/`loadUrl("javascript:...")` só alcança o frame principal, não o `<iframe>` do widget
 

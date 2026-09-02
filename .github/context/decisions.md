@@ -49,24 +49,45 @@ Correção (`1744011 fix(webview): relay keyboard state postMessage into the cha
 
 **Conhecimento permanente (aplica-se a qualquer comunicação nativo→JS futura neste SDK):** `WebView.evaluateJavascript(...)` (e `loadUrl("javascript:...")`) executa **apenas no frame principal** carregado pelo `WebView` — nunca propaga automaticamente para dentro de um `<iframe>` filho. `BlipSdkTemplate.html` carrega o widget real (`blip-chat-widget`) dentro de um iframe (`blip-chat-iframe`), então qualquer mensagem que precise chegar ao **conteúdo do iframe** (e não ao template SDK em si) exige uma função de relay explícita no template — buscar o iframe por `getElementById` e chamar `contentWindow.postMessage(...)` com `targetOrigin` real — como `setPresence`/`setKeyboardOpen` já fazem. Nunca assumir que `window.postMessage` disparado no frame principal alcança o iframe.
 
-## Débito técnico conhecido: captura de foto nativa (E1) quebra em modo Embedded com NPE
+## E1 (captura de foto nativa): corrigido em ambos os modos (Full Screen e Embedded)
 
-Investigado nesta sessão (branch `feat/blip-chat-evolution-energisa`), **não corrigido** — classificado como `NEEDS_PRODUCT_DECISION` (depende de confirmar se a Energisa usará o modo Embedded; ver também [architecture.md](./architecture.md) para os dois modos de integração).
+**Decisão de produto:** modo Embedded (E1) DEVE funcionar corretamente — não será usado pela Energisa, mas serve outros clientes do SDK. Esta decisão substitui e revoga qualquer classificação anterior como `NEEDS_PRODUCT_DECISION` ou "fora de escopo"/"não será corrigido" para o modo Embedded.
 
-Causa raiz confirmada lendo o código (não é hipótese):
+Causa raiz original (confirmada lendo o código, branch `feat/blip-chat-evolution-energisa`):
 
-- Em `ThreadService.configureWebView` (`ThreadService.java`), a linha `ThreadActivity threadActivity = (context instanceof ThreadActivity) ? (ThreadActivity) context : null;` só atribui uma referência de Activity quando o `context` é especificamente `ThreadActivity` (modo Full Screen) — **não** quando é uma `Activity` genérica (que é o que `BlipChatFragment` (modo Embedded) tipicamente fornece via `getActivity()`/`requireContext()`). Resultado: `threadActivity` é `null` no modo Embedded.
-- Esse `threadActivity` (possivelmente `null`) é passado para `new CustomWebChromeClient(threadActivity, actualListener)` (`CustomWebChromeClient.java`), que guarda a referência no campo `activity` sem null-check.
-- `CustomWebChromeClient.onShowFileChooser(...)` usa esse campo `activity` tanto para `ActivityCompat.requestPermissions(activity, ...)` (caminho de permissão não concedida, API ≥ 23) quanto, no fluxo normal, via `startChooserIntent(...)` → `activity.startActivityForResult(chooserIntent, FCR)`. Com `activity == null`, isso lança `NullPointerException` assim que o usuário toca em "tirar foto"/escolher arquivo dentro de um `BlipChatFragment`.
-- Mesmo que o NPE fosse evitado, o resultado do chooser (`onActivityResult`) não teria onde ser entregue: `BlipChatFragment.java` (`net.take.blipchat.activities.BlipChatFragment`) **não sobrescreve `onActivityResult`** — só `ThreadActivity.java` o faz (usa `ThreadService.getLastCustomWebChromeClient()` para recuperar o `pathCallback`/`filePath`). Ou seja, o gap tem duas partes: (1) NPE imediato por falta da referência de Activity, e (2) mesmo com a referência, falta um receptor de `onActivityResult` no lado do Fragment.
+- Em `ThreadService.configureWebView` (`ThreadService.java`), a linha `ThreadActivity threadActivity = (context instanceof ThreadActivity) ? (ThreadActivity) context : null;` só atribuía uma referência de Activity quando o `context` era especificamente `ThreadActivity` (modo Full Screen) — não quando era uma `Activity` genérica (o que `BlipChatFragment`, modo Embedded, tipicamente fornece via `getActivity()`/`requireContext()`). Resultado: `threadActivity` era `null` no modo Embedded.
+- Esse `threadActivity` (possivelmente `null`) era passado para `new CustomWebChromeClient(threadActivity, actualListener)` (`CustomWebChromeClient.java`), que guardava a referência no campo `activity` sem null-check.
+- `CustomWebChromeClient.onShowFileChooser(...)` usava esse campo `activity` tanto para `ActivityCompat.requestPermissions(activity, ...)` (permissão não concedida, API ≥ 23) quanto, no fluxo normal, via `startChooserIntent(...)` → `activity.startActivityForResult(chooserIntent, FCR)`. Com `activity == null`, isso lançava `NullPointerException` assim que o usuário tocava em "tirar foto"/escolher arquivo dentro de um `BlipChatFragment`.
+- Mesmo evitando o NPE, o resultado do chooser (`onActivityResult`) não teria onde ser entregue: `BlipChatFragment.java` não sobrescrevia `onActivityResult` — só `ThreadActivity.java` o fazia.
 
-Arquivos exatos envolvidos, para uma sessão futura não precisar reinvestigar:
+### Rodada 1 — `a152165 fix(webview): support file chooser and camera capture in Embedded mode`
 
-- `src/blip-chat/src/main/java/net/take/blipchat/services/ThreadService.java` (método `configureWebView`, linha do `instanceof ThreadActivity`)
-- `src/blip-chat/src/main/java/net/take/blipchat/webview/CustomWebChromeClient.java` (construtor, campo `activity`, método `onShowFileChooser`, `startChooserIntent`)
-- `src/blip-chat/src/main/java/net/take/blipchat/activities/BlipChatFragment.java` (ausência de `onActivityResult`)
+Eliminou o NPE generalizando `CustomWebChromeClient`/`ThreadService` de `ThreadActivity` para `Activity` genérica, e adicionou `BlipChatFragment.onActivityResult`.
 
-Caminho de correção não implementado ainda (a explorar quando houver decisão de produto): passar a `Activity` hospedeira genérica (via `getActivity()` do Fragment, propagada até `configureWebView`) em vez de depender de `instanceof ThreadActivity`, e adicionar `onActivityResult` em `BlipChatFragment` delegando para `ThreadService.getLastCustomWebChromeClient()`, com atenção ao risco de estado estático compartilhado já documentado em [architecture.md](./architecture.md#fato-chave-activity-e-fragment-reusam-a-mesma-lógica).
+**Blockers residuais encontrados por um Reviewer nesta rodada** (confirmados via decompilação de bytecode de `support-fragment:26.1.0`, não hipótese): `startActivityForResult`/`requestPermissions` chamados na `Activity` bruta **nunca roteavam de volta ao Fragment** — em modo Embedded, o chooser/permissão precisa ser disparado a partir do `Fragment` (que intercepta o resultado via seu próprio `onActivityResult`/`onRequestPermissionsResult` antes de delegar à Activity), não da `Activity` diretamente.
+
+### Rodada 2 — `b8eafce fix(webview): route file chooser and permission requests through the Fragment in Embedded mode`
+
+Corrigiu os 2 blockers propagando um `Fragment` opcional por toda a cadeia (`CustomWebChromeClient` → `ThreadService.setupChatView`/`configureWebView` → `BlipChatFragment`), usando `fragment.startActivityForResult`/`fragment.requestPermissions` quando em modo Embedded (em vez de `activity.startActivityForResult`/`ActivityCompat.requestPermissions`). Adicionado `BlipChatFragment.onRequestPermissionsResult` (novo), delegando a `ThreadService.handlePermissionsResult`.
+
+**Confirmado `APPROVED_WITH_NOTES` por um Reviewer independente**, que validou por bytecode que o roteamento funciona e que o `requestCode` original chega correto ao Fragment.
+
+### Rodada 3 — `38393c8 docs(readme): document FragmentActivity host requirement for Embedded mode`
+
+README atualizado documentando o requisito de integração: a Activity hospedeira do modo Embedded deve ser `FragmentActivity`/`AppCompatActivity` e propagar `super.onActivityResult`/`onRequestPermissionsResult` (caso a Activity hospedeira sobrescreva esses métodos).
+
+**`ThreadActivity.java` (modo Full Screen) não foi tocado em nenhuma das 3 mudanças** — continua funcionando exatamente como antes.
+
+### Riscos residuais não bloqueantes (aceitos como pendência conhecida, não introduzidos por esta correção)
+
+- **Estado estático compartilhado:** `ThreadService.lastCustomWebChromeClient` continua sendo um singleton `static` compartilhado (ver [architecture.md](./architecture.md#fato-chave-activity-e-fragment-reusam-a-mesma-lógica)) — se múltiplas instâncias coexistirem (Fragment + Activity simultâneas, ou múltiplos Fragments), o resultado pode ser roteado para o `CustomWebChromeClient` errado. Débito arquitetural pré-existente, não introduzido por esta correção.
+- **Diálogo de permissão negada permanentemente ausente em Embedded:** o modo Embedded não replica o diálogo `showDialogPermissionDeniedPermanently` que existe em modo Full Screen — simplificação deliberada, UX secundária, não bloqueante.
+
+Arquivos exatos envolvidos, para referência futura:
+
+- `src/blip-chat/src/main/java/net/take/blipchat/services/ThreadService.java` (`configureWebView`, `setupChatView`, `handlePermissionsResult`)
+- `src/blip-chat/src/main/java/net/take/blipchat/webview/CustomWebChromeClient.java` (construtor, campo `activity`/`fragment`, `onShowFileChooser`, `startChooserIntent`)
+- `src/blip-chat/src/main/java/net/take/blipchat/activities/BlipChatFragment.java` (`onActivityResult`, `onRequestPermissionsResult`)
 
 ## Unknowns (não confirmados nesta investigação)
 
