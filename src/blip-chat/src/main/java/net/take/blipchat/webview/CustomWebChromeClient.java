@@ -44,6 +44,8 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
     private String permissionOrigin;
     private ValueCallback<Uri[]> pathCallback;
     private String filePath;
+    // True when the page asked for direct camera capture (<input capture>): skip the gallery/file chooser.
+    private boolean captureOnly;
     public final static int FCR=1;
 
 
@@ -141,6 +143,7 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
             pathCallback = null;
         }
         pathCallback = filePathCallback;
+        captureOnly = fileChooserParams != null && fileChooserParams.isCaptureEnabled();
 
         if(Build.VERSION.SDK_INT >=23 && !checkAllInputFilePermissions()) {
             String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
@@ -159,6 +162,15 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
     }
 
     private void startChooserIntent(Intent takePictureIntent) {
+        if (captureOnly && takePictureIntent != null) {
+            if (fragment != null) {
+                fragment.startActivityForResult(takePictureIntent, FCR);
+            } else {
+                activity.startActivityForResult(takePictureIntent, FCR);
+            }
+            return;
+        }
+
         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
         contentSelectionIntent.setType("*/*");

@@ -1,6 +1,7 @@
 package net.take.blipchat.services;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -78,6 +79,16 @@ public class ThreadService {
         configureWebView(webView, rootView.getContext(), appKey, blipOptions, listener, fragment);
     }
     
+    private static Activity findActivity(Context context) {
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
+    }
+
     private static void configureWebView(WebView webView, Context context, String appKey, BlipOptions blipOptions, ThreadActivityListener listener, Fragment fragment) {
         String baseUrl = "https://" + context.getPackageName();
         
@@ -96,7 +107,7 @@ public class ThreadService {
             };
         }
         
-        Activity activity = (context instanceof Activity) ? (Activity) context : null;
+        Activity activity = findActivity(context);
         WebAppInterface webAppInterface = new WebAppInterface(context);
         
         BlipWebViewBuilder webViewBuilder = new BlipWebViewBuilder(context, webView);
@@ -124,8 +135,8 @@ public class ThreadService {
         
         webView = webViewBuilder.build();
         
-        if (context instanceof Activity) {
-            setKeyboardVisibilityListener((Activity) context, webAppInterface, webView);
+        if (activity != null) {
+            setKeyboardVisibilityListener(activity, webAppInterface, webView);
         }
         
         String pageContent = generateHtmlPageContent(context, appKey, blipOptions);
