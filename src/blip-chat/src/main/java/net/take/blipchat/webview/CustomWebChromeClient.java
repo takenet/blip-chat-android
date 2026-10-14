@@ -2,6 +2,7 @@ package net.take.blipchat.webview;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
@@ -20,7 +22,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import net.take.blipchat.R;
-import net.take.blipchat.activities.ThreadActivity;
 import net.take.blipchat.listeners.ExternalFilePermissionListener;
 import net.take.blipchat.listeners.GeolocationPermissionListener;
 import net.take.blipchat.listeners.ThreadActivityListener;
@@ -36,13 +37,16 @@ import static net.take.blipchat.activities.ThreadActivity.WRITE_EXTERNAL_STORAGE
 //WebViewChrome let you know when progress change to set the value for the progress bar
 public class CustomWebChromeClient extends WebChromeClient implements GeolocationPermissionListener, ExternalFilePermissionListener {
 
-    private ThreadActivity activity;
+    private Activity activity;
+    private final Fragment fragment;
     private final ThreadActivityListener listener;
     private GeolocationPermissions.Callback permissionCallback;
     private String permissionOrigin;
     private ValueCallback<Uri[]> pathCallback;
     private String filePath;
-    private final static int FCR=1;
+    // True when the page asked for direct camera capture (<input capture>): skip the gallery/file chooser.
+    private boolean captureOnly;
+    public final static int FCR=1;
 
 
     public ValueCallback<Uri[]> getPathCallback() {
@@ -53,8 +57,9 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
         return filePath;
     }
 
-    public CustomWebChromeClient(ThreadActivity activity, ThreadActivityListener listener) {
+    public CustomWebChromeClient(Activity activity, Fragment fragment, ThreadActivityListener listener) {
         this.activity = activity;
+        this.fragment = fragment;
         this.listener = listener;
     }
 
@@ -80,8 +85,12 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissionCallback = callback;
             permissionOrigin = origin;
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_FINE_LOCATION);
+            String[] permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+            if (fragment != null) {
+                fragment.requestPermissions(permissions, PERMISSIONS_REQUEST_FINE_LOCATION);
+            } else {
+                ActivityCompat.requestPermissions(activity, permissions, PERMISSIONS_REQUEST_FINE_LOCATION);
+            }
         } else {
             callback.invoke(origin, true, false);
         }
@@ -134,9 +143,15 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
             pathCallback = null;
         }
         pathCallback = filePathCallback;
+        captureOnly = fileChooserParams != null && fileChooserParams.isCaptureEnabled();
 
         if(Build.VERSION.SDK_INT >=23 && !checkAllInputFilePermissions()) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, WRITE_EXTERNAL_STORAGE);
+            String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
+            if (fragment != null) {
+                fragment.requestPermissions(permissions, WRITE_EXTERNAL_STORAGE);
+            } else {
+                ActivityCompat.requestPermissions(activity, permissions, WRITE_EXTERNAL_STORAGE);
+            }
             Log.d(CustomWebChromeClient.class.getCanonicalName(), "onShowFileChooser: Don't have all permissions needed, asking for it");
             return true;
         }
@@ -147,6 +162,15 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
     }
 
     private void startChooserIntent(Intent takePictureIntent) {
+        if (captureOnly && takePictureIntent != null) {
+            if (fragment != null) {
+                fragment.startActivityForResult(takePictureIntent, FCR);
+            } else {
+                activity.startActivityForResult(takePictureIntent, FCR);
+            }
+            return;
+        }
+
         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
         contentSelectionIntent.setType("*/*");
@@ -162,7 +186,11 @@ public class CustomWebChromeClient extends WebChromeClient implements Geolocatio
         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
         chooserIntent.putExtra(Intent.EXTRA_TITLE, R.string.blipchat_file_chooser);
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-        activity.startActivityForResult(chooserIntent, FCR);
+        if (fragment != null) {
+            fragment.startActivityForResult(chooserIntent, FCR);
+        } else {
+            activity.startActivityForResult(chooserIntent, FCR);
+        }
     }
 
     @Nullable
