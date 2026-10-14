@@ -28,7 +28,7 @@ allprojects {
 
 Add the dependency:
 ```groovy
-implementation 'io.github.takenet:blipchat:3.0.01.2'
+implementation 'io.github.takenet:blipchat:3.0.01.3'
 ```
 
 How to use
